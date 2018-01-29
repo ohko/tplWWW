@@ -1,0 +1,3 @@
+#!/bin/sh
+
+go-bindata-assetfs -ignore=\\.git -ignore=\\.gitignore -ignore=\\.DS_Store -nocompress -pkg=tplWWW sysStatic/...
