@@ -1,9 +1,8 @@
 package controller
 
 import (
-	"tplwww/model"
-
 	"github.com/ohko/hst"
+	"github.com/ohko/tplwww/model"
 )
 
 // IndexController 默认主页控制器

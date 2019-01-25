@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"log"
 	"time"
-	"tplwww/controller"
 
 	"github.com/ohko/hst"
+	"github.com/ohko/tplwww/controller"
 )
 
 var addr = "0.0.0.0:8080"
@@ -56,4 +56,9 @@ func main() {
 
 	// 优雅关闭
 	hst.Shutdown(time.Second*5, s)
+}
+
+// Test ...
+func Test() {
+	print("test")
 }

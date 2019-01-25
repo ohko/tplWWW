@@ -3,9 +3,9 @@ package controller
 import (
 	"net/http"
 	"time"
-	"tplwww/model"
 
 	"github.com/ohko/hst"
+	"github.com/ohko/tplwww/model"
 )
 
 // Controller ...
