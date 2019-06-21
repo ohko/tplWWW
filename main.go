@@ -2,20 +2,30 @@ package main
 
 import (
 	"encoding/json"
-	"log"
+	"io/ioutil"
 	"time"
 
 	"github.com/ohko/hst"
+	"github.com/ohko/logger"
 	"github.com/ohko/tplwww/controller"
 )
 
-var addr = "0.0.0.0:8080"
+var (
+	addr = "0.0.0.0:8080"
+	ll   = logger.NewLogger()
+)
 
-func main() {
-	log.Println(log.Ldate | log.Ltime | log.Lshortfile)
-
+func start() {
 	// hst对象
 	s := hst.New(nil)
+
+	// 禁止显示Route日志
+	s.DisableRouteLog = true
+	s.SetLogger(ioutil.Discard)
+
+	// HTML模版
+	s.SetDelims("{[{", "}]}")
+	s.SetTemplatePath("./view/")
 
 	// favicon.ico
 	s.Favicon()
@@ -27,18 +37,10 @@ func main() {
 	s.StaticGzip("/public/", "./public/")
 
 	// 注册自动路由
-	s.RegisterHandle(
+	s.RegisterHandle(nil,
 		&controller.IndexController{},
 		&controller.AdminController{},
 	)
-
-	// 重定义转义符
-	s.SetDelims("<!-- {{", "}} -->")
-
-	// 设置Layout模版
-	s.SetLayout("layoutDefault", "./view/layout/default.html")
-	s.SetLayout("layoutAdmin", "./view/layout/admin.html")
-	s.SetLayout("layoutEmpty", "./view/layout/empty.html")
 
 	// 设置模版函数
 	s.SetTemplateFunc(map[string]interface{}{
@@ -58,7 +60,7 @@ func main() {
 	hst.Shutdown(time.Second*5, s)
 }
 
-// Test ...
-func Test() {
-	print("test")
+func main() {
+	ll.Log4Trace("=== START WEB SERVER ===")
+	start()
 }

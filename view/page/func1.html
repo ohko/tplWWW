@@ -1,8 +1,10 @@
-<!-- {{define "body"}} -->
+{[{ define "page/func1.html" }]}
+{[{ template "layout/default_header.html" . }]}
 <section class="content-header">
     This is /Func1
     <div>JSON:<!-- {{.|json}} --></div>
     <div>UID:<!-- {{.UID}} --></div>
     <div>Name:<!-- {{.Name}} --></div>
 </section>
-<!-- {{end}} -->
+{[{ template "layout/default_footer.html" . }]}
+{[{ end }]}

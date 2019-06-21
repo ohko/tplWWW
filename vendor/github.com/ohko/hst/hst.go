@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"html/template"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -18,18 +19,23 @@ import (
 
 // HST ...
 type HST struct {
-	s           *http.Server
-	handle      *http.ServeMux
-	hs          *Handlers
-	Addr        string
-	session     Session
-	CrossOrigin string // 支持跨域 "*" / "a.com,b.com"
+	s               *http.Server
+	handle          *http.ServeMux
+	hs              *Handlers
+	Addr            string
+	session         Session
+	CrossOrigin     string // 支持跨域 "*" / "a.com,b.com"
+	DisableRouteLog bool   // 禁止显示启动时的route路径显示
 
-	// template
-	templateDelims  []string
-	templatePath    string
+	// template 读取模版到内存
+	template        *template.Template
+	templateDelims  *delims
 	templateFuncMap template.FuncMap
-	layout          map[string][]string
+	// 用于template中找不到时，去模版目录读取模版文件
+	templatePath string
+
+	handleFuncs map[string]map[string][]HandlerFunc
+	logger      io.Writer
 }
 
 // HandlerFunc ...
@@ -40,6 +46,11 @@ type hstError struct{ s string }
 
 func (o *hstError) Error() string { return o.s }
 
+type delims struct {
+	left  string
+	right string
+}
+
 // New ...
 func New(handlers *Handlers) *HST {
 	log.SetFlags(log.Lshortfile | log.Ldate | log.Ltime)
@@ -47,7 +58,9 @@ func New(handlers *Handlers) *HST {
 	o := new(HST)
 	o.handle = http.NewServeMux()
 	o.hs = handlers
-	o.layout = make(map[string][]string)
+	o.templatePath = "./"
+	o.templateDelims = &delims{left: "{{", right: "}}"}
+	o.handleFuncs = make(map[string]map[string][]HandlerFunc)
 	return o
 }
 
@@ -153,59 +166,47 @@ func (o *HST) ListenTLS(addr, ca, crt, key string) error {
 	return nil
 }
 
-// HandleFunc ...
+// HandleFunc 添加路由
 // Example:
 //		HandleFunc("/", func(c *hst.Context){}, func(c *hst.Context){})
 func (o *HST) HandleFunc(pattern string, handler ...HandlerFunc) *HST {
-	log.Println("handle:", pattern)
-	o.handle.HandleFunc(pattern, func(w http.ResponseWriter, r *http.Request) {
-		c := &Context{
-			hst:     o,
-			session: o.session,
-			W:       w,
-			R:       r,
-			close:   false,
-		}
-		for _, v := range handler {
-			func(v HandlerFunc, c *Context) {
-				defer func() {
-					if err := recover(); err != nil {
-						switch err.(type) {
-						case hstError, *hstError:
-							c.close = true
-						default:
-							log.Println(err)
-							dep := 0
-							for i := 1; i < 10; i++ {
-								_, file, line, ok := runtime.Caller(i)
-								if !ok {
-									break
-								}
-								if strings.Contains(file, "/runtime/") || strings.Contains(file, "/reflect/") {
-									continue
-								}
-								log.Printf("%s∟%s(%d)\n", strings.Repeat(" ", dep), file, line)
-								dep++
-							}
-							defer func() { recover() }()
-							c.HTML("found error")
-						}
-					}
-				}()
-				v(c)
-			}(v, c)
-			if c.close {
-				break
-			}
-		}
-	})
-	return o
+	return handleFunc(o, "", pattern, handler...)
 }
 
-// RegisterHandle ...
+// GET ...
+func (o *HST) GET(pattern string, handler ...HandlerFunc) *HST {
+	return handleFunc(o, "GET", pattern, handler...)
+}
+
+// POST ...
+func (o *HST) POST(pattern string, handler ...HandlerFunc) *HST {
+	return handleFunc(o, "POST", pattern, handler...)
+}
+
+// PUT ...
+func (o *HST) PUT(pattern string, handler ...HandlerFunc) *HST {
+	return handleFunc(o, "PUT", pattern, handler...)
+}
+
+// PATCH ...
+func (o *HST) PATCH(pattern string, handler ...HandlerFunc) *HST {
+	return handleFunc(o, "PATCH", pattern, handler...)
+}
+
+// DELETE ...
+func (o *HST) DELETE(pattern string, handler ...HandlerFunc) *HST {
+	return handleFunc(o, "DELETE", pattern, handler...)
+}
+
+// OPTIONS ...
+func (o *HST) OPTIONS(pattern string, handler ...HandlerFunc) *HST {
+	return handleFunc(o, "OPTIONS", pattern, handler...)
+}
+
+// RegisterHandle 注册自动路由
 // Example:
 //		RegisterHandle(&User{}, &Other{})
-func (o *HST) RegisterHandle(classes ...interface{}) *HST {
+func (o *HST) RegisterHandle(middleware []HandlerFunc, classes ...interface{}) *HST {
 	fixName := func(name string) string {
 		r := []rune(name)
 		a := map[rune]rune{'A': 'a', 'B': 'b', 'C': 'c', 'D': 'd', 'E': 'e', 'F': 'f', 'G': 'g', 'H': 'h', 'I': 'i', 'J': 'j', 'K': 'k', 'L': 'l', 'M': 'm', 'N': 'n', 'O': 'o', 'P': 'p', 'Q': 'q', 'R': 'r', 'S': 's', 'T': 't', 'U': 'u', 'V': 'v', 'W': 'w', 'X': 'x', 'Y': 'y', 'Z': 'z'}
@@ -239,9 +240,9 @@ func (o *HST) RegisterHandle(classes ...interface{}) *HST {
 				method = "/"
 			}
 			path := name + method
-			o.HandleFunc(path, func(v reflect.Value) HandlerFunc {
+			o.HandleFunc(path, append(middleware, func(v reflect.Value) HandlerFunc {
 				return func(c *Context) { v.Call([]reflect.Value{reflect.ValueOf(c)}) }
-			}(reflect.ValueOf(c).Method(i)))
+			}(reflect.ValueOf(c).Method(i)))...)
 		}
 	}
 	return o
@@ -311,7 +312,7 @@ func (o *HST) HandlePfx(partten, pfxPath string) *HST {
 
 // SetDelims 定义模板符号
 func (o *HST) SetDelims(left, right string) *HST {
-	o.templateDelims = []string{left, right}
+	o.templateDelims = &delims{left: left, right: right}
 	return o
 }
 
@@ -321,23 +322,41 @@ func (o *HST) SetTemplateFunc(funcMap template.FuncMap) *HST {
 	return o
 }
 
-// SetTemplatePath 设置模板路径
-func (o *HST) SetTemplatePath(path string) *HST {
-	if !strings.HasSuffix(path, "/") {
-		path += "/"
-	}
-	o.templatePath = path
-	return o
-}
-
-// SetLayout 定义layout模板
-func (o *HST) SetLayout(name string, files ...string) *HST {
-	o.layout[name] = files
-	return o
-}
-
 // SetSession 设置Session
 func (o *HST) SetSession(sess Session) *HST {
 	o.session = sess
+	return o
+}
+
+// ParseGlob 预加载模版文件
+func (o *HST) ParseGlob(pattern string) *HST {
+	o.template = template.Must(template.New("").
+		Delims(o.templateDelims.left, o.templateDelims.right).
+		Funcs(o.templateFuncMap).
+		ParseGlob(pattern))
+	return o
+}
+
+// ParseFiles 预加载模版文件
+func (o *HST) ParseFiles(filenames ...string) *HST {
+	o.template = template.Must(template.New("").
+		Delims(o.templateDelims.left, o.templateDelims.right).
+		Funcs(o.templateFuncMap).
+		ParseFiles(filenames...))
+	return o
+}
+
+// SetTemplatePath 设置模版文件跟路径
+func (o *HST) SetTemplatePath(pathname string) *HST {
+	if !strings.HasSuffix(pathname, "/") {
+		pathname += "/"
+	}
+	o.templatePath = pathname
+	return o
+}
+
+// SetLogger 设置日志记录
+func (o *HST) SetLogger(logger io.Writer) *HST {
+	o.logger = logger
 	return o
 }

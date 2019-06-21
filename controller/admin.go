@@ -8,16 +8,17 @@ import (
 	"github.com/ohko/tplwww/model"
 )
 
-// Controller ...
-type Controller interface {
-	CheckLogined(c *hst.Context) bool // 判断是否已经登陆
-	DoLogout(c *hst.Context) bool     // 登出，由/logout调用
-	DoLogin(c *hst.Context)           // 登陆，在/login页面调用
-	GetMenu(c *hst.Context)           // 菜单，在加载页面时调用
+// AdminController 默认管理控制器
+type AdminController struct {
+	app
 }
 
-// AdminController 默认管理控制器
-type AdminController struct{}
+// 渲染模版
+func (o *AdminController) render(ctx *hst.Context, name string, data interface{}, names ...string) {
+	names = append(names, "layout/admin_header.html")
+	names = append(names, "layout/admin_footer.html")
+	ctx.HTML2(200, name, data, names...)
+}
 
 // Index ...
 func (o *AdminController) Index(ctx *hst.Context) {
@@ -26,9 +27,10 @@ func (o *AdminController) Index(ctx *hst.Context) {
 		ctx.Close()
 		return
 	}
-	// o.RenderFilesByTplDefault(c,nil, "../sysStatic/index.html")
-	ctx.LayoutRender("layoutAdmin", nil, "./view/admin/index.html")
+	o.render(ctx, "admin/index.html", nil)
 }
+
+// CheckLogined ...
 func (o *AdminController) CheckLogined(ctx *hst.Context) bool {
 	if v, _ := ctx.SessionGet("Name"); v != nil {
 		return true
@@ -39,7 +41,7 @@ func (o *AdminController) CheckLogined(ctx *hst.Context) bool {
 // Login 登录
 func (o *AdminController) Login(ctx *hst.Context) {
 	if ctx.R.Method == "GET" {
-		ctx.LayoutRender("layoutEmpty", nil, "./view/admin/login.html")
+		ctx.HTML2(200, "admin/login.html", nil, "layout/empty_header.html", "layout/empty_footer.html")
 	}
 
 	ctx.R.ParseForm()
@@ -49,10 +51,10 @@ func (o *AdminController) Login(ctx *hst.Context) {
 	if account == "demo" && password == "demo" {
 		ctx.SessionSet("UID", 1, time.Minute*30)
 		ctx.SessionSet("Name", "管理员", time.Minute*30)
-		ctx.JSON2(0, "ok")
+		ctx.JSON2(200, 0, "ok")
 		return
 	}
-	ctx.JSON2(1, "密码错误")
+	ctx.JSON2(200, 1, "密码错误")
 }
 
 // Logout 登出
@@ -65,12 +67,13 @@ func (o *AdminController) Logout(ctx *hst.Context) {
 // GetMenu 默认菜单
 func (o *AdminController) GetMenu(ctx *hst.Context) {
 	if !o.CheckLogined(ctx) {
-		ctx.JSON2(-1, "请先登陆")
+		ctx.JSON2(200, -1, "请先登陆")
 		return
 	}
 
 	accountName, _ := ctx.SessionGet("Name")
-	ctx.JSON2(0, []model.Menu{
+	ctx.JSON2(200, 0, []model.Menu{
+		model.Menu{Class: "fa-home", Text: "Home " + accountName.(string), Href: "/admin"},
 		model.Menu{Class: "fa-dashboard", Text: "菜单组",
 			Child: []model.Menu{
 				model.Menu{Class: "fa-circle-o", Text: "功能1", Href: "/admin/func1"},
@@ -86,10 +89,10 @@ func (o *AdminController) Func1(ctx *hst.Context) {
 		UID:  "123",
 		Name: "hello",
 	}
-	ctx.LayoutRender("layoutAdmin", user, "./view/func1.html")
+	o.render(ctx, "admin/func1.html", user)
 }
 
 // Func2 ...
 func (o *AdminController) Func2(ctx *hst.Context) {
-	ctx.LayoutRender("layoutAdmin", nil, "./view/func2.html")
+	o.render(ctx, "admin/func2.html", nil)
 }

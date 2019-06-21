@@ -1,0 +1,10 @@
+{[{ define "admin/func1.html" }]}
+{[{ template "layout/admin_header.html" . }]}
+<section class="content-header">
+    This is /Func1
+    <div>JSON:<!-- {{.|json}} --></div>
+    <div>UID:<!-- {{.UID}} --></div>
+    <div>Name:<!-- {{.Name}} --></div>
+</section>
+{[{ template "layout/admin_footer.html" . }]}
+{[{ end }]}
