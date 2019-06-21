@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/ohko/hst"
-	"github.com/ohko/tplwww/model"
+	"github.com/ohko/tpler/model"
 )
 
 // AdminController 默认管理控制器

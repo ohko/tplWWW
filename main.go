@@ -7,7 +7,7 @@ import (
 
 	"github.com/ohko/hst"
 	"github.com/ohko/logger"
-	"github.com/ohko/tplwww/controller"
+	"github.com/ohko/tpler/controller"
 )
 
 var (
