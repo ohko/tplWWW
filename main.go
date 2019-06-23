@@ -11,8 +11,9 @@ import (
 )
 
 var (
-	addr = "0.0.0.0:8080"
-	ll   = logger.NewLogger()
+	addr        = "0.0.0.0:8080"
+	sessionPath = "/tmp/hst_session"
+	ll          = logger.NewLogger()
 )
 
 func start() {
@@ -20,7 +21,7 @@ func start() {
 	s := hst.New(nil)
 
 	// 禁止显示Route日志
-	s.DisableRouteLog = true
+	// s.DisableRouteLog = true
 	s.SetLogger(ioutil.Discard)
 
 	// HTML模版
@@ -31,7 +32,8 @@ func start() {
 	s.Favicon()
 
 	// Session
-	s.SetSession(hst.NewSessionMemory())
+	// s.SetSession(hst.NewSessionMemory())
+	s.SetSession(hst.NewSessionFile(sessionPath, time.Minute*30))
 
 	// 静态文件
 	s.StaticGzip("/public/", "./public/")
@@ -62,5 +64,6 @@ func start() {
 
 func main() {
 	ll.Log4Trace("=== START WEB SERVER ===")
+
 	start()
 }

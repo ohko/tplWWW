@@ -1,5 +1,4 @@
-{[{ define "admin/login.html" }]}
-{[{ template "layout/empty_header.html" . }]}
+{[{ define "body" }]}
 <div class="login-box">
   <div class="login-logo">
     <a href="./">LOGIN</a>
@@ -9,7 +8,7 @@
 
     <form onsubmit="return doLogin(this)" method="post">
       <div class="form-group has-feedback">
-        <input type="text" class="form-control" placeholder="帐号" name="account">
+        <input type="text" class="form-control" placeholder="帐号" name="user">
         <span class="glyphicon glyphicon-user form-control-feedback"></span>
       </div>
       <div class="form-group has-feedback">
@@ -33,10 +32,10 @@
 <script>
   function doLogin(o) {
     $.post("/admin/login", {
-        Account: o.account.value,
-        Password: o.password.value,
-        Remember: o.remember.checked
-      },
+      User: o.user.value,
+      Password: o.password.value,
+      Remember: o.remember.checked
+    },
       function (x) {
         if (x.no != 0) return alert(x.data);
         $(".login-box-msg").html("登陆成功");
@@ -52,5 +51,4 @@
     });
   });
 </script>
-{[{ template "layout/empty_footer.html" . }]}
 {[{ end }]}

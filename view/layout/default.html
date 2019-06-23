@@ -1,4 +1,4 @@
-{[{ define "layout/default_header.html" }]}
+{[{ define "layout/default.html" }]}
 <!DOCTYPE html>
 <html>
 
@@ -71,4 +71,19 @@
     </nav>
 
     <main role="main">
-        {[{ end }]}
+        
+        {[{ template "body" . }]}
+
+    </main>
+    <footer class="container">
+        <a href="https://cdeyun.com" target="_blank">
+            <p>&copy; 成都的云科技公司 cdeyun.com 2019</p>
+        </a>
+    </footer>
+    
+    <script src="/public/js/jquery.min.js"></script>
+    <script src="/public/js/bootstrap.min.js"></script>
+</body>
+    
+</html>
+{[{ end }]}
