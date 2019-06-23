@@ -86,5 +86,5 @@ func (o *Oauth2Controller) Callback(ctx *hst.Context) {
 
 	u := rst.Data.(map[string]interface{})
 	o.loginSuccess(ctx, u["uid"].(string), u["user"].(string))
-	http.Redirect(ctx.W, ctx.R, "/admin/", http.StatusTemporaryRedirect)
+	http.Redirect(ctx.W, ctx.R, "/admin/", http.StatusFound)
 }

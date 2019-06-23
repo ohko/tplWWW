@@ -16,6 +16,7 @@ var ll = logger.NewLogger()
 // Start 启动WEB服务
 func Start(addr, sessionPath, oauth2Server string) {
 	oauthServerHost = oauth2Server
+	oauthStateString = time.Now().Format("20060102150405")
 
 	// hst对象
 	s := hst.New(nil)
