@@ -27,8 +27,8 @@ var oauthConfig = &oauth2.Config{
 	RedirectURL:  "/oauth2/callback",
 	Scopes:       []string{"(no scope)"},
 	Endpoint: oauth2.Endpoint{
-		AuthURL:  oauthServerHost + "/oauth2/auth",
-		TokenURL: oauthServerHost + "/oauth2/token",
+		AuthURL:  "/oauth2/auth",
+		TokenURL: "/oauth2/token",
 	},
 }
 
@@ -40,6 +40,8 @@ func (o *Oauth2Controller) Login(ctx *hst.Context) {
 		} else {
 			oauthConfig.RedirectURL = "https://" + ctx.R.Host + oauthConfig.RedirectURL
 		}
+		oauthConfig.Endpoint.AuthURL = oauthServerHost + oauthConfig.Endpoint.AuthURL
+		oauthConfig.Endpoint.TokenURL = oauthServerHost + oauthConfig.Endpoint.TokenURL
 	}
 	url := oauthConfig.AuthCodeURL(oauthStateString)
 	http.Redirect(ctx.W, ctx.R, url, http.StatusTemporaryRedirect)
