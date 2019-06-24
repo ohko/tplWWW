@@ -17,9 +17,42 @@ func (o *AdminController) render(ctx *hst.Context, data interface{}, names ...st
 	ctx.HTML2(200, "layout/admin.html", data, names...)
 }
 
+func checkLogined(ctx *hst.Context) bool {
+	if v, _ := ctx.SessionGet("User"); v != nil {
+		return true
+	}
+	return false
+}
+
+// Login 登录
+func (o *AdminController) Login(ctx *hst.Context) {
+	if ctx.R.Method == "GET" {
+		ctx.HTML2(200, "layout/empty.html", nil, "admin/login.html")
+	}
+
+	ctx.R.ParseForm()
+	user := ctx.R.FormValue("User")
+	pass := ctx.R.FormValue("Password")
+
+	u := new(model.User)
+	if err := u.Check(user, pass); err != nil {
+		ctx.JSON2(200, 1, err.Error())
+	}
+
+	o.loginSuccess(ctx, "1", user)
+	ctx.JSON2(200, 0, "ok")
+}
+
+// Logout 登出
+func (o *AdminController) Logout(ctx *hst.Context) {
+	ctx.SessionDestory()
+	http.Redirect(ctx.W, ctx.R, "/admin/login", 302)
+	ctx.Close()
+}
+
 // Index ...
 func (o *AdminController) Index(ctx *hst.Context) {
-	if !o.CheckLogined(ctx) {
+	if !checkLogined(ctx) {
 		http.Redirect(ctx.W, ctx.R, "/admin/login", 302)
 		ctx.Close()
 		return
@@ -29,7 +62,7 @@ func (o *AdminController) Index(ctx *hst.Context) {
 
 // GetMenu 默认菜单
 func (o *AdminController) GetMenu(ctx *hst.Context) {
-	if !o.CheckLogined(ctx) {
+	if !checkLogined(ctx) {
 		ctx.JSON2(200, -1, "请先登陆")
 		return
 	}

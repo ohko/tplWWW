@@ -1,6 +1,6 @@
 # github.com/golang/protobuf v1.2.0
 github.com/golang/protobuf/proto
-# github.com/ohko/hst v0.0.0-20190624105815-55ee0899209f
+# github.com/ohko/hst v0.0.0-20190624135023-3a017e8a2d0b
 github.com/ohko/hst
 # github.com/ohko/logger v0.0.0-20190528021150-9a26c0a46528
 github.com/ohko/logger

@@ -71,7 +71,7 @@
                     menus: []
                 },
                 created: function () {
-                    $.getJSON("./get_menu", function (x) {
+                    $.getJSON("/admin/get_menu", function (x) {
                         if (x.no == -1) return location.href = "./login";
                         if (x.no != 0) return alert(x.data);
                         vueMenu.menus = x.data;

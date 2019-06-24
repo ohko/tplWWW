@@ -3,12 +3,10 @@ package controller
 import (
 	"encoding/json"
 	"io/ioutil"
-	"net/http"
 	"time"
 
 	"github.com/ohko/hst"
 	"github.com/ohko/logger"
-	"github.com/ohko/tpler/model"
 )
 
 var ll = logger.NewLogger()
@@ -34,7 +32,7 @@ func Start(addr, sessionPath, oauth2Server string) {
 
 	// Session
 	// s.SetSession(hst.NewSessionMemory())
-	s.SetSession(hst.NewSessionFile(sessionPath, time.Minute*30))
+	s.SetSession(hst.NewSessionFile("TPLER", sessionPath, time.Minute*30))
 
 	// 静态文件
 	s.StaticGzip("/public/", "./public/")
@@ -66,41 +64,12 @@ func Start(addr, sessionPath, oauth2Server string) {
 
 type app struct{}
 
-// CheckLogined ...
-func (o *app) CheckLogined(ctx *hst.Context) bool {
-	if v, _ := ctx.SessionGet("User"); v != nil {
-		return true
-	}
-	return false
-}
-
-// Login 登录
-func (o *app) Login(ctx *hst.Context) {
-	if ctx.R.Method == "GET" {
-		ctx.HTML2(200, "layout/empty.html", nil, "admin/login.html")
-	}
-
-	ctx.R.ParseForm()
-	user := ctx.R.FormValue("User")
-	pass := ctx.R.FormValue("Password")
-
-	u := new(model.User)
-	if err := u.Check(user, pass); err != nil {
-		ctx.JSON2(200, 1, err.Error())
-	}
-
-	o.loginSuccess(ctx, "1", user)
-	ctx.JSON2(200, 0, "ok")
+// 渲染错误页面
+func (o *app) renderError(ctx *hst.Context, data interface{}) {
+	ctx.HTML2(200, "layout/empty.html", data, "page/error.html")
 }
 
 func (o *app) loginSuccess(ctx *hst.Context, uid, user string) {
-	ctx.SessionSet("UID", uid, time.Minute*30)
-	ctx.SessionSet("User", user, time.Minute*30)
-}
-
-// Logout 登出
-func (o *app) Logout(ctx *hst.Context) {
-	ctx.SessionDestory()
-	http.Redirect(ctx.W, ctx.R, "/admin/login", 302)
-	ctx.Close()
+	ctx.SessionSet("", "/", "UID", uid, time.Minute*30)
+	ctx.SessionSet("", "/", "User", user, time.Minute*30)
 }
