@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"strings"
+	"net/url"
 
 	"github.com/ohko/hst"
 	"golang.org/x/oauth2"
@@ -19,32 +19,29 @@ type Oauth2Controller struct {
 var (
 	oauthStateString = "random"
 	oauthServerHost  = "https://oauth2.cdeyun.com"
+	oauthRedirectURL = "/oauth2/callback"
 )
 
 var oauthConfig = &oauth2.Config{
 	ClientID:     "your_client_id",
 	ClientSecret: "your_client_secret",
-	RedirectURL:  "/oauth2/callback",
+	RedirectURL:  oauthRedirectURL,
 	Scopes:       []string{"(no scope)"},
 	Endpoint: oauth2.Endpoint{
-		AuthURL:  "/oauth2/auth",
-		TokenURL: "/oauth2/token",
+		AuthURL:  oauthServerHost + "/oauth2/auth",
+		TokenURL: oauthServerHost + "/oauth2/token",
 	},
 }
 
 // Login 跳转oauth2登录授权页面
 func (o *Oauth2Controller) Login(ctx *hst.Context) {
-	if !strings.HasPrefix(oauthConfig.RedirectURL, "http") {
-		if ctx.R.TLS == nil {
-			oauthConfig.RedirectURL = "http://" + ctx.R.Host + oauthConfig.RedirectURL
-		} else {
-			oauthConfig.RedirectURL = "https://" + ctx.R.Host + oauthConfig.RedirectURL
-		}
-		oauthConfig.Endpoint.AuthURL = oauthServerHost + oauthConfig.Endpoint.AuthURL
-		oauthConfig.Endpoint.TokenURL = oauthServerHost + oauthConfig.Endpoint.TokenURL
+	if ctx.R.TLS == nil {
+		oauthConfig.RedirectURL = "http://" + ctx.R.Host + oauthRedirectURL + "?callback=" + url.QueryEscape(ctx.R.FormValue("callback"))
+	} else {
+		oauthConfig.RedirectURL = "https://" + ctx.R.Host + oauthRedirectURL + "?callback=" + url.QueryEscape(ctx.R.FormValue("callback"))
 	}
-	url := oauthConfig.AuthCodeURL(oauthStateString)
-	http.Redirect(ctx.W, ctx.R, url, http.StatusTemporaryRedirect)
+	uri := oauthConfig.AuthCodeURL(oauthStateString)
+	http.Redirect(ctx.W, ctx.R, uri, http.StatusTemporaryRedirect)
 }
 
 // Callback oauth2登录授权返回
@@ -91,5 +88,10 @@ func (o *Oauth2Controller) Callback(ctx *hst.Context) {
 
 	u := rst.Data.(map[string]interface{})
 	o.loginSuccess(ctx, u["uid"].(string), u["user"].(string))
+
+	if ctx.R.FormValue("callback") != "" {
+		http.Redirect(ctx.W, ctx.R, ctx.R.FormValue("callback"), http.StatusFound)
+		return
+	}
 	http.Redirect(ctx.W, ctx.R, "/admin/", http.StatusFound)
 }

@@ -1,7 +1,7 @@
 module github.com/ohko/tpler
 
 require (
-	github.com/ohko/hst v0.0.0-20190624135023-3a017e8a2d0b
-	github.com/ohko/logger v0.0.0-20190528021150-9a26c0a46528
+	github.com/ohko/hst v0.0.0-20190714103655-154bd3620ad4
+	github.com/ohko/logger v0.0.0-20190624074930-d4e00f2e53f7
 	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
 )

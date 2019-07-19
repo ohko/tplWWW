@@ -1,8 +1,8 @@
 # github.com/golang/protobuf v1.2.0
 github.com/golang/protobuf/proto
-# github.com/ohko/hst v0.0.0-20190624135023-3a017e8a2d0b
+# github.com/ohko/hst v0.0.0-20190714103655-154bd3620ad4
 github.com/ohko/hst
-# github.com/ohko/logger v0.0.0-20190528021150-9a26c0a46528
+# github.com/ohko/logger v0.0.0-20190624074930-d4e00f2e53f7
 github.com/ohko/logger
 # golang.org/x/crypto v0.0.0-20190122013713-64072686203f
 golang.org/x/crypto/acme/autocert

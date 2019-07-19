@@ -11,12 +11,12 @@ type Menu struct {
 // GetAdminMenu ...
 func (o *Menu) GetAdminMenu(who string) []Menu {
 	return []Menu{
-		Menu{Class: "fa-home", Text: "Home", Href: "/admin"},
+		Menu{Class: "fa-home", Text: "仪表盘", Href: "/admin/"},
 		Menu{Class: "fa-dashboard", Text: "菜单组",
 			Child: []Menu{
-				Menu{Class: "fa-circle-o", Text: "功能1", Href: "/admin/func1"},
-				Menu{Class: "fa-circle-o", Text: "功能2", Href: "/admin/func2"},
+				Menu{Class: "fa-circle-o", Text: "表单", Href: "/admin/form"},
+				Menu{Class: "fa-circle-o", Text: "表格", Href: "/admin/table"},
 			}},
-		Menu{Class: "fa-share", Text: "Logout:" + who, Href: "javascript:vueMenu.logout()"},
+		Menu{Class: "fa-share", Text: "退出:" + who, Href: "javascript:vueMenu.logout()"},
 	}
 }

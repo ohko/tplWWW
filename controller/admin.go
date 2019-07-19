@@ -2,6 +2,7 @@ package controller
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/ohko/hst"
 	"github.com/ohko/tpler/model"
@@ -17,30 +18,32 @@ func (o *AdminController) render(ctx *hst.Context, data interface{}, names ...st
 	ctx.HTML2(200, "layout/admin.html", data, names...)
 }
 
-func checkLogined(ctx *hst.Context) bool {
-	if v, _ := ctx.SessionGet("User"); v != nil {
-		return true
-	}
-	return false
-}
-
 // Login 登录
 func (o *AdminController) Login(ctx *hst.Context) {
 	if ctx.R.Method == "GET" {
-		ctx.HTML2(200, "layout/empty.html", nil, "admin/login.html")
+		ctx.HTML2(200, "layout/empty.html", map[string]string{
+			"callback": ctx.R.FormValue("callback"),
+		}, "admin/login.html")
 	}
 
 	ctx.R.ParseForm()
 	user := ctx.R.FormValue("User")
 	pass := ctx.R.FormValue("Password")
+	callback := ctx.R.FormValue("callback")
 
-	u := new(model.User)
-	if err := u.Check(user, pass); err != nil {
+	if err := users.Check(user, pass); err != nil {
 		ctx.JSON2(200, 1, err.Error())
 	}
 
 	o.loginSuccess(ctx, "1", user)
-	ctx.JSON2(200, 0, "ok")
+
+	if strings.Contains(ctx.R.Header.Get("Content-Type"), "application/x-www-form-urlencoded") {
+		ctx.JSON2(200, 0, "ok")
+	} else if callback != "" {
+		http.Redirect(ctx.W, ctx.R, callback, 302)
+	} else {
+		http.Redirect(ctx.W, ctx.R, "/admin/", 302)
+	}
 }
 
 // Logout 登出
@@ -52,35 +55,25 @@ func (o *AdminController) Logout(ctx *hst.Context) {
 
 // Index ...
 func (o *AdminController) Index(ctx *hst.Context) {
-	if !checkLogined(ctx) {
-		http.Redirect(ctx.W, ctx.R, "/admin/login", 302)
-		ctx.Close()
-		return
-	}
-	o.render(ctx, nil, "admin/index.html")
-}
-
-// GetMenu 默认菜单
-func (o *AdminController) GetMenu(ctx *hst.Context) {
-	if !checkLogined(ctx) {
-		ctx.JSON2(200, -1, "请先登陆")
-		return
-	}
-
-	user, _ := ctx.SessionGet("User")
-	ctx.JSON2(200, 0, new(model.Menu).GetAdminMenu(user.(string)))
-}
-
-// Func1 ...
-func (o *AdminController) Func1(ctx *hst.Context) {
 	user := &model.User{
 		UID:  "123",
 		User: "hello",
 	}
-	o.render(ctx, user, "admin/func1.html")
+	o.render(ctx, user, "admin/index.html")
 }
 
-// Func2 ...
-func (o *AdminController) Func2(ctx *hst.Context) {
-	o.render(ctx, nil, "admin/func2.html")
+// GetMenu 默认菜单
+func (o *AdminController) GetMenu(ctx *hst.Context) {
+	user, _ := ctx.SessionGet("User")
+	ctx.JSON2(200, 0, new(model.Menu).GetAdminMenu(user.(string)))
+}
+
+// Form ...
+func (o *AdminController) Form(ctx *hst.Context) {
+	o.render(ctx, nil, "admin/form.html")
+}
+
+// Table ...
+func (o *AdminController) Table(ctx *hst.Context) {
+	o.render(ctx, nil, "admin/table.html")
 }

@@ -3,13 +3,22 @@ package controller
 import (
 	"encoding/json"
 	"io/ioutil"
+	"net/http"
+	"net/url"
+	"strings"
 	"time"
 
 	"github.com/ohko/hst"
 	"github.com/ohko/logger"
+	"github.com/ohko/tpler/model"
 )
 
-var ll = logger.NewLogger()
+var (
+	ll          = logger.NewLogger()
+	sessionName = "TPLER"
+
+	users = model.NewUser()
+)
 
 // Start 启动WEB服务
 func Start(addr, sessionPath, oauth2Server string) {
@@ -32,13 +41,13 @@ func Start(addr, sessionPath, oauth2Server string) {
 
 	// Session
 	// s.SetSession(hst.NewSessionMemory())
-	s.SetSession(hst.NewSessionFile("TPLER", sessionPath, time.Minute*30))
+	s.SetSession(hst.NewSessionFile("", "/", sessionName, sessionPath, time.Minute*30))
 
 	// 静态文件
 	s.StaticGzip("/public/", "./public/")
 
 	// 注册自动路由
-	s.RegisterHandle(nil,
+	s.RegisterHandle([]hst.HandlerFunc{checkLogined},
 		&IndexController{},
 		&AdminController{},
 		&Oauth2Controller{},
@@ -62,6 +71,41 @@ func Start(addr, sessionPath, oauth2Server string) {
 	hst.Shutdown(time.Second*5, s)
 }
 
+// 登录检查
+func checkLogined(ctx *hst.Context) {
+
+	if u, err := url.ParseRequestURI(ctx.R.RequestURI); err == nil {
+		// 排除路径
+		for _, v := range []string{
+			"/",
+			"/admin/login",
+			"/oauth2/login",
+			"/oauth2/callback",
+		} {
+			if u.Path == v {
+				return
+			}
+		}
+	}
+
+	if v, err := ctx.SessionGet("User"); err == nil && v != nil {
+		return
+	}
+
+	if strings.Contains(ctx.R.Header.Get("Accept"), "application/json") {
+		ctx.JSON2(200, -1, "Please login")
+	} else {
+		uri := ctx.R.Host + ctx.R.RequestURI
+		if ctx.R.TLS == nil {
+			uri = "http://" + uri
+		} else {
+			uri = "https://" + uri
+		}
+		http.Redirect(ctx.W, ctx.R, "/admin/login?callback="+url.QueryEscape(uri), 302)
+		ctx.Close()
+	}
+}
+
 type app struct{}
 
 // 渲染错误页面
@@ -70,6 +114,6 @@ func (o *app) renderError(ctx *hst.Context, data interface{}) {
 }
 
 func (o *app) loginSuccess(ctx *hst.Context, uid, user string) {
-	ctx.SessionSet("", "/", "UID", uid, time.Minute*30)
-	ctx.SessionSet("", "/", "User", user, time.Minute*30)
+	ctx.SessionSet("UID", uid)
+	ctx.SessionSetExpire("User", user, time.Minute*30)
 }

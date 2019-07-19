@@ -9,6 +9,11 @@ type User struct {
 	Pass string
 }
 
+// NewUser ...
+func NewUser() *User {
+	return new(User)
+}
+
 // Check ...
 func (o *User) Check(user, pass string) error {
 	if user != "demo" || pass != "demo" {
