@@ -4,8 +4,9 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/ohko/hst"
 	"tpler/model"
+
+	"github.com/ohko/hst"
 )
 
 // AdminController 默认管理控制器
@@ -35,7 +36,7 @@ func (o *AdminController) Login(ctx *hst.Context) {
 		ctx.JSON2(200, 1, err.Error())
 	}
 
-	o.loginSuccess(ctx, "1", user)
+	o.loginSuccess(ctx, user)
 
 	if strings.Contains(ctx.R.Header.Get("Content-Type"), "application/x-www-form-urlencoded") {
 		ctx.JSON2(200, 0, "ok")

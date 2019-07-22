@@ -8,9 +8,10 @@ import (
 	"strings"
 	"time"
 
+	"tpler/model"
+
 	"github.com/ohko/hst"
 	"github.com/ohko/logger"
-	"tpler/model"
 )
 
 var (
@@ -113,7 +114,6 @@ func (o *app) renderError(ctx *hst.Context, data interface{}) {
 	ctx.HTML2(200, "layout/empty.html", data, "page/error.html")
 }
 
-func (o *app) loginSuccess(ctx *hst.Context, uid, user string) {
-	ctx.SessionSet("UID", uid)
-	ctx.SessionSetExpire("User", user, time.Minute*30)
+func (o *app) loginSuccess(ctx *hst.Context, user string) {
+	ctx.SessionSet("User", user)
 }
