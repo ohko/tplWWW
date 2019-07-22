@@ -10,7 +10,7 @@ import (
 
 	"github.com/ohko/hst"
 	"github.com/ohko/logger"
-	"github.com/ohko/tpler/model"
+	"tpler/model"
 )
 
 var (

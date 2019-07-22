@@ -1,4 +1,4 @@
-module github.com/ohko/tpler
+module tpler
 
 require (
 	github.com/ohko/hst v0.0.0-20190722041456-23126c6f8534

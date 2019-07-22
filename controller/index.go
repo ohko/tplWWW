@@ -2,7 +2,7 @@ package controller
 
 import (
 	"github.com/ohko/hst"
-	"github.com/ohko/tpler/model"
+	"tpler/model"
 )
 
 // IndexController 默认主页控制器

@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/ohko/hst"
-	"github.com/ohko/tpler/model"
+	"tpler/model"
 )
 
 // AdminController 默认管理控制器
