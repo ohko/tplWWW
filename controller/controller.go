@@ -15,15 +15,39 @@ import (
 )
 
 var (
-	ll          = logger.NewLogger()
+	ll          *logger.Logger
 	sessionName = "TPLER"
 
-	users = model.NewUser()
+	users   = model.NewUser()
+	members = model.NewMember()
 )
 
+type controller struct{}
+
+// 渲染错误页面
+func (o *controller) renderAdminError(ctx *hst.Context, data interface{}) {
+	ctx.HTML2(200, "layout/admin.html", data, "admin/error.html")
+}
+
+// 渲染成功页面
+func (o *controller) renderAdminSuccess(ctx *hst.Context, data interface{}) {
+	ctx.HTML2(200, "layout/admin.html", data, "admin/success.html")
+}
+
+// 渲染后台模版
+func (o *controller) renderAdmin(ctx *hst.Context, data interface{}, names ...string) {
+	ctx.HTML2(200, "layout/admin.html", data, names...)
+}
+
+// 渲染前台模版
+func (o *controller) renderDefault(ctx *hst.Context, data interface{}, names ...string) {
+	ctx.HTML2(200, "layout/default.html", data, names...)
+}
+
 // Start 启动WEB服务
-func Start(addr, sessionPath, oauth2Server string) {
-	oauthServerHost = oauth2Server
+func Start(addr, sessionPath, oauth2Server string, lll *logger.Logger) {
+	ll = lll
+	oauth2Init(oauth2Server)
 	oauthStateString = time.Now().Format("20060102150405")
 
 	// hst对象
@@ -48,9 +72,11 @@ func Start(addr, sessionPath, oauth2Server string) {
 	s.StaticGzip("/public/", "./public/")
 
 	// 注册自动路由
-	s.RegisterHandle([]hst.HandlerFunc{checkLogined},
+	s.RegisterHandle(
+		[]hst.HandlerFunc{checkAdminLogined},
 		&IndexController{},
 		&AdminController{},
+		&AdminUserController{},
 		&Oauth2Controller{},
 	)
 
@@ -73,7 +99,7 @@ func Start(addr, sessionPath, oauth2Server string) {
 }
 
 // 登录检查
-func checkLogined(ctx *hst.Context) {
+func checkAdminLogined(ctx *hst.Context) {
 
 	if u, err := url.ParseRequestURI(ctx.R.RequestURI); err == nil {
 		// 排除路径
@@ -89,7 +115,7 @@ func checkLogined(ctx *hst.Context) {
 		}
 	}
 
-	if v, err := ctx.SessionGet("User"); err == nil && v != nil {
+	if v, err := ctx.SessionGet("Member"); err == nil && v != nil {
 		return
 	}
 
@@ -105,15 +131,4 @@ func checkLogined(ctx *hst.Context) {
 		http.Redirect(ctx.W, ctx.R, "/admin/login?callback="+url.QueryEscape(uri), 302)
 		ctx.Close()
 	}
-}
-
-type app struct{}
-
-// 渲染错误页面
-func (o *app) renderError(ctx *hst.Context, data interface{}) {
-	ctx.HTML2(200, "layout/empty.html", data, "page/error.html")
-}
-
-func (o *app) loginSuccess(ctx *hst.Context, user string) {
-	ctx.SessionSet("User", user)
 }

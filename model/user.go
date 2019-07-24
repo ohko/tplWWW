@@ -1,12 +1,17 @@
 package model
 
-import "errors"
+import (
+	"bytes"
+	"errors"
+
+	"tpler/util"
+)
 
 // User 用户模型
 type User struct {
-	UID  string
-	User string
-	Pass string
+	User  string `gorm:"PRIMARY_KEY"`
+	Pass  string `json:"-"`
+	Email string
 }
 
 // NewUser ...
@@ -16,8 +21,48 @@ func NewUser() *User {
 
 // Check ...
 func (o *User) Check(user, pass string) error {
-	if user != "demo" || pass != "demo" {
+	u, err := o.Get(user)
+	if err != nil {
+		return err
+	}
+
+	if bytes.Compare([]byte(u.Pass), util.Hash([]byte(pass))) != 0 {
 		return errors.New("password error")
 	}
+
 	return nil
+}
+
+// List ...
+func (o *User) List() ([]*User, error) {
+	var us []*User
+	if err := db.Find(&us).Error; err != nil {
+		return nil, err
+	}
+	return us, nil
+}
+
+// Get ...
+func (o *User) Get(user string) (*User, error) {
+	var u User
+
+	if err := db.Find(&u, &User{User: user}).Error; err != nil {
+		return nil, err
+	}
+
+	return &u, nil
+}
+
+// Save ...
+func (o *User) Save(u *User) error {
+	if u.User == "" {
+		return errors.New("user error")
+	}
+
+	return db.Save(u).Error
+}
+
+// Delete ...
+func (o *User) Delete(user string) error {
+	return db.Delete(&User{User: user}).Error
 }

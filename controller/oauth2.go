@@ -13,24 +13,28 @@ import (
 
 // Oauth2Controller 默认主页控制器
 type Oauth2Controller struct {
-	app
+	controller
 }
 
 var (
 	oauthStateString = "random"
-	oauthServerHost  = "http://127.0.0.1:8000"
+	oauthServerHost  = ""
 	oauthRedirectURL = "/oauth2/callback"
+	oauthConfig      *oauth2.Config
 )
 
-var oauthConfig = &oauth2.Config{
-	ClientID:     "your_client_id",
-	ClientSecret: "your_client_secret",
-	RedirectURL:  oauthRedirectURL,
-	Scopes:       []string{"(no scope)"},
-	Endpoint: oauth2.Endpoint{
-		AuthURL:  oauthServerHost + "/oauth2/auth",
-		TokenURL: oauthServerHost + "/oauth2/token",
-	},
+func oauth2Init(o2srv string) {
+	oauthServerHost = o2srv
+	oauthConfig = &oauth2.Config{
+		ClientID:     "your_client_id",
+		ClientSecret: "your_client_secret",
+		RedirectURL:  oauthRedirectURL,
+		Scopes:       []string{"(no scope)"},
+		Endpoint: oauth2.Endpoint{
+			AuthURL:  oauthServerHost + "/oauth2/auth",
+			TokenURL: oauthServerHost + "/oauth2/token",
+		},
+	}
 }
 
 // Login 跳转oauth2登录授权页面
@@ -49,13 +53,13 @@ func (o *Oauth2Controller) Callback(ctx *hst.Context) {
 	ll.Log0Debug("Callback:", ctx.R.Method, ctx.R.RequestURI, ctx.R.Form.Encode())
 	state := ctx.R.FormValue("state")
 	if state != oauthStateString {
-		o.renderError(ctx, fmt.Sprintf("invalid oauth state, expected '%s', got '%s'\n", oauthStateString, state))
+		o.renderAdminError(ctx, fmt.Sprintf("invalid oauth state, expected '%s', got '%s'\n", oauthStateString, state))
 		return
 	}
 
 	errorMsg := ctx.R.FormValue("error")
 	if errorMsg != "" {
-		o.renderError(ctx, errorMsg)
+		o.renderAdminError(ctx, errorMsg)
 	}
 
 	code := ctx.R.FormValue("code")
@@ -87,7 +91,7 @@ func (o *Oauth2Controller) Callback(ctx *hst.Context) {
 	}
 
 	u := rst.Data.(map[string]interface{})
-	o.loginSuccess(ctx, u["User"].(string))
+	ctx.SessionSet("Member", u["User"].(string))
 
 	if ctx.R.FormValue("callback") != "" {
 		http.Redirect(ctx.W, ctx.R, ctx.R.FormValue("callback"), http.StatusFound)
