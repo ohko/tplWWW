@@ -32,7 +32,7 @@
                     <li class="header">MAIN NAVIGATION</li>
                     <template v-for="(m,k) in menus">
                         <li class="treeview" v-if="m.Child" :menuID="k">
-                            <a href="#">
+                            <a>
                                 <i :class="'fa '+m.Class"></i>
                                 <span>{{m.Text}}</span>
                                 <span class="pull-right-container">
