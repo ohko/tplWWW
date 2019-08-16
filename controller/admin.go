@@ -87,6 +87,7 @@ func (o *AdminController) Password(ctx *hst.Context) {
 func (o *AdminController) GetMenu(ctx *hst.Context) {
 	m, _ := ctx.SessionGet("Member")
 	ctx.JSON2(200, 0, new(model.Menu).GetAdminMenu(m.(string)))
+	// ctx.JSON2(200, 0, new(model.Menu).GetAdminMenu("admin"))
 }
 
 // Form ...

@@ -52,6 +52,7 @@ func Start(addr, sessionPath, oauth2Server string, lll *logger.Logger) {
 
 	// hst对象
 	s := hst.New(nil)
+	s.CrossOrigin = "*"
 
 	// 禁止显示Route日志
 	// s.DisableRouteLog = true
@@ -100,6 +101,7 @@ func Start(addr, sessionPath, oauth2Server string, lll *logger.Logger) {
 
 // 登录检查
 func checkAdminLogined(ctx *hst.Context) {
+	return
 
 	if u, err := url.ParseRequestURI(ctx.R.RequestURI); err == nil {
 		// 排除路径
