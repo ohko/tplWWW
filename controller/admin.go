@@ -2,7 +2,6 @@ package controller
 
 import (
 	"net/http"
-	"strings"
 
 	"tpler/model"
 	"tpler/util"
@@ -34,7 +33,7 @@ func (o *AdminController) Login(ctx *hst.Context) {
 
 	ctx.SessionSet("Member", user)
 
-	if strings.Contains(ctx.R.Header.Get("Content-Type"), "application/x-www-form-urlencoded") {
+	if ctx.IsAjax() {
 		ctx.JSON2(200, 0, "ok")
 	} else if callback != "" {
 		http.Redirect(ctx.W, ctx.R, callback, 302)
@@ -46,8 +45,12 @@ func (o *AdminController) Login(ctx *hst.Context) {
 // Logout 登出
 func (o *AdminController) Logout(ctx *hst.Context) {
 	ctx.SessionDestory()
-	http.Redirect(ctx.W, ctx.R, "/admin/login", 302)
-	ctx.Close()
+	if ctx.IsAjax() {
+		ctx.JSON2(200, 0, "ok")
+	} else {
+		http.Redirect(ctx.W, ctx.R, "/admin/login", 302)
+		ctx.Close()
+	}
 }
 
 // Index ...
@@ -80,6 +83,9 @@ func (o *AdminController) Password(ctx *hst.Context) {
 	if err := members.Save(u); err != nil {
 		o.renderAdminError(ctx, err.Error())
 	}
+	if ctx.IsAjax() {
+		ctx.JSON2(200, 0, "ok")
+	}
 	o.renderAdminSuccess(ctx, "密码修改成功")
 }
 
@@ -87,6 +93,14 @@ func (o *AdminController) Password(ctx *hst.Context) {
 func (o *AdminController) GetMenu(ctx *hst.Context) {
 	m, _ := ctx.SessionGet("Member")
 	ctx.JSON2(200, 0, new(model.Menu).GetAdminMenu(m.(string)))
+	// ctx.JSON2(200, 0, new(model.Menu).GetAdminMenu("admin"))
+}
+
+// GetAdmMenu 默认菜单
+func (o *AdminController) GetAdmMenu(ctx *hst.Context) {
+	m, _ := ctx.SessionGet("Member")
+	ctx.JSON2(200, 0, new(model.Menu).GetAdmMenu(m.(string)))
+	// ctx.JSON2(200, 0, new(model.Menu).GetAdminMenu("admin"))
 }
 
 // Form ...

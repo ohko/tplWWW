@@ -26,11 +26,17 @@ type controller struct{}
 
 // 渲染错误页面
 func (o *controller) renderAdminError(ctx *hst.Context, data interface{}) {
+	if ctx.IsAjax() {
+		ctx.JSON2(200, 1, data)
+	}
 	ctx.HTML2(200, "layout/admin.html", data, "admin/error.html")
 }
 
 // 渲染成功页面
 func (o *controller) renderAdminSuccess(ctx *hst.Context, data interface{}) {
+	if ctx.IsAjax() {
+		ctx.JSON2(200, 0, data)
+	}
 	ctx.HTML2(200, "layout/admin.html", data, "admin/success.html")
 }
 
@@ -52,6 +58,7 @@ func Start(addr, sessionPath, oauth2Server string, lll *logger.Logger) {
 
 	// hst对象
 	s := hst.New(nil)
+	s.CrossOrigin = "*"
 
 	// 禁止显示Route日志
 	// s.DisableRouteLog = true
@@ -70,6 +77,7 @@ func Start(addr, sessionPath, oauth2Server string, lll *logger.Logger) {
 
 	// 静态文件
 	s.StaticGzip("/public/", "./public/")
+	s.StaticGzip("/adm/", "./dist")
 
 	// 注册自动路由
 	s.RegisterHandle(
@@ -100,11 +108,11 @@ func Start(addr, sessionPath, oauth2Server string, lll *logger.Logger) {
 
 // 登录检查
 func checkAdminLogined(ctx *hst.Context) {
-
 	if u, err := url.ParseRequestURI(ctx.R.RequestURI); err == nil {
 		// 排除路径
 		for _, v := range []string{
 			"/",
+			"/adm/",
 			"/admin/login",
 			"/oauth2/login",
 			"/oauth2/callback",

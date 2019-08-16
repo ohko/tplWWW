@@ -21,6 +21,10 @@ func (o *AdminUserController) List(ctx *hst.Context) {
 		o.renderAdminError(ctx, err.Error())
 	}
 
+	if ctx.IsAjax() {
+		ctx.JSON2(200, 0, us)
+	}
+
 	o.renderAdmin(ctx, map[string]interface{}{"us": us}, "admin/user/list.html")
 }
 
@@ -38,6 +42,9 @@ func (o *AdminUserController) Add(ctx *hst.Context) {
 	if err := users.Save(u); err != nil {
 		o.renderAdminError(ctx, err.Error())
 	}
+	if ctx.IsAjax() {
+		ctx.JSON2(200, 0, "ok")
+	}
 	http.Redirect(ctx.W, ctx.R, "/admin_user/list", http.StatusFound)
 }
 
@@ -50,6 +57,9 @@ func (o *AdminUserController) Edit(ctx *hst.Context) {
 	}
 
 	if ctx.R.Method == "GET" {
+		if ctx.IsAjax() {
+			ctx.JSON2(200, 0, u)
+		}
 		o.renderAdmin(ctx, u, "admin/user/edit.html")
 	}
 
@@ -61,6 +71,9 @@ func (o *AdminUserController) Edit(ctx *hst.Context) {
 	if err := u.Save(u); err != nil {
 		o.renderAdminError(ctx, err.Error())
 	}
+	if ctx.IsAjax() {
+		ctx.JSON2(200, 0, "ok")
+	}
 	http.Redirect(ctx.W, ctx.R, "/admin_user/list", http.StatusFound)
 }
 
@@ -71,5 +84,8 @@ func (o *AdminUserController) Delete(ctx *hst.Context) {
 		o.renderAdminError(ctx, err.Error())
 	}
 
+	if ctx.IsAjax() {
+		ctx.JSON2(200, 0, "ok")
+	}
 	http.Redirect(ctx.W, ctx.R, "/admin_user/list", http.StatusFound)
 }

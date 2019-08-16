@@ -1,1 +1,6 @@
 go.sum
+.cache
+dist
+node_modules
+public/admin/
+db/
