@@ -32,9 +32,9 @@
 
         <div class="social-auth-links text-center">
           <p>- OR -</p>
-          <aa href="/oauth2/login?callback={[{.callback}]}" class="btn btn-block btn-success btn-flat"><i
-              class="fa fa-lock"></i> Sign in using
-            OAuth2</aa>
+          <div @click="oauth2" class="btn btn-block btn-success btn-flat"><i class="fa fa-lock"></i>
+            Sign in using
+            OAuth2</div>
         </div>
 
         <a href="/">返回首页</a><br>
@@ -52,6 +52,7 @@
     },
     data() {
       return {
+        callback: encodeURIComponent("//" + location.host + "/public/admin"),
         form: {
           User: "admin",
           Password: "admin",
@@ -60,7 +61,9 @@
       }
     },
     props: {},
-    created() { },
+    created() {
+      if (this.$route.params.hasOwnProperty('callback')) this.callback = this.$route.params.callback
+    },
     mounted() {
       $('input')
         .iCheck({
@@ -74,6 +77,9 @@
     },
     destroyed() { },
     methods: {
+      oauth2() {
+        location.href = "/oauth2/login?callback=" + this.callback
+      },
       doLogin(o) {
         this.$post("/admin/login", this.form, x => {
           if (x.no != 0) return alert(x.data);

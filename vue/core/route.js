@@ -18,7 +18,7 @@ module.exports = [
    { path: '/', component: Dashboard },
    { path: '/admin', component: Dashboard },
    { path: '/admin/dashboard', component: Dashboard },
-   { path: '/admin/login', component: Login },
+   { path: '/admin/login', name: "login", component: Login },
    { path: '/admin/logout', component: Logout },
    { path: '/admin/form', component: Form },
    { path: '/admin/table', component: Table },

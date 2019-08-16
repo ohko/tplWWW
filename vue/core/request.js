@@ -13,7 +13,7 @@ const getJSON = (url, params, callback) => {
    }
 
    $.getJSON(BASE_URL + url, params, x => {
-      if (x.no == -1 && window.vue) return window.vue.$router.push('/admin/login')
+      if (x.no == -1 && window.vue) return window.vue.$router.push({ name: 'login', params: { callback: encodeURIComponent(location.href) } })
       callback(x)
    });
 }
@@ -27,7 +27,7 @@ const post = (url, params, callback) => {
    }
 
    $.post(BASE_URL + url, params, x => {
-      if (x.no == -1 && window.vue) return window.vue.$router.push('/admin/login')
+      if (x.no == -1 && window.vue) return window.vue.$router.push({ name: 'login', params: { callback: encodeURIComponent(location.href) } })
       if (x.no != 0) return alert(x.data)
       callback(x)
    });
