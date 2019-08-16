@@ -80,8 +80,8 @@
 
 <script>
     import DefaultLayout from "../layout/default.vue"
-    import Quill from 'quill'
-    import '../node_modules/quill/dist/quill.snow.css'
+    import Quill from '../../public/js/quill.js'
+    import '../../public/css/quill.snow.css'
 
     export default {
         components: {

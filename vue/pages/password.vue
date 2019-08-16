@@ -6,23 +6,19 @@
                     <!-- general form elements -->
                     <div class="box box-primary">
                         <div class="box-header with-border">
-                            <h3 class="box-title">添加用户</h3>
+                            <h3 class="box-title">修改密码</h3>
                         </div>
                         <!-- /.box-header -->
                         <!-- form start -->
-                        <form role="form" method="POST">
+                        <form role="form" @submit.prevent="submit">
                             <div class="box-body">
                                 <div class="form-group">
-                                    <label>帐号</label>
-                                    <input type="text" class="form-control" placeholder="输入用户名" name="User">
+                                    <label>新密码</label>
+                                    <input type="password" class="form-control" placeholder="新密码" v-model="form.Pass">
                                 </div>
                                 <div class="form-group">
-                                    <label>密码</label>
-                                    <input type="password" class="form-control" placeholder="密码" name="Pass">
-                                </div>
-                                <div class="form-group">
-                                    <label>邮箱</label>
-                                    <input type="email" class="form-control" placeholder="输入邮箱地址" name="Email">
+                                    <label>确认密码</label>
+                                    <input type="password" class="form-control" placeholder="确认密码" v-model="form.Pass2">
                                 </div>
                             </div>
                             <!-- /.box-body -->
@@ -47,12 +43,30 @@
         components: {
             DefaultLayout
         },
-        data() { return {} },
+        data() {
+            return {
+                form: {
+                    Pass: "",
+                    Pass2: "",
+                }
+            }
+        },
         props: {},
         created() { },
         mounted() { },
         destroyed() { },
-        methods: {},
+        methods: {
+            submit() {
+                if (this.form.Pass.length == 0 || this.form.Pass != this.form.Pass2) {
+                    return alert("两次输入的密码不一致！")
+                }
+
+                this.$post('/admin/password', this.form, x => {
+                    if (x.no != 0) return alert(x.msg)
+                    this.$router.push('/admin/login')
+                })
+            }
+        },
         filters: {},
         watch: {},
         computed: {},

@@ -45,7 +45,6 @@
 
 <script>
   import EmptyLayout from "../layout/empty.vue";
-  import { post } from "../core/request.js"
 
   export default {
     components: {
@@ -56,7 +55,7 @@
         form: {
           User: "admin",
           Password: "admin",
-          Remember: false,
+          Remember: true,
         }
       }
     },
@@ -76,10 +75,10 @@
     destroyed() { },
     methods: {
       doLogin(o) {
-        post("/admin/login", this.form, x => {
+        this.$post("/admin/login", this.form, x => {
           if (x.no != 0) return alert(x.data);
           $(".login-box-msg").html("登陆成功");
-          this.$root.go('/admin/dashboard');
+          this.$router.push('/admin/dashboard');
         });
       }
     },

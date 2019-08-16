@@ -9,3 +9,13 @@
 ```
 git clone https://github.com/ohko/tpler.git
 ```
+
+## 前端vue开发
+```
+parcel vue/index.html
+```
+
+## 编译vue
+```
+parcel build --public-url=/public/admin/ --out-dir=./public/admin/ --no-source-maps --no-cache --no-minify vue/index.html
+```

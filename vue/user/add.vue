@@ -10,22 +10,19 @@
                         </div>
                         <!-- /.box-header -->
                         <!-- form start -->
-                        <form role="form" method="POST">
-                            <input name="User" value="{[{ .User }]}" type="hidden">
+                        <form role="form" @submit.prevent="submit">
                             <div class="box-body">
                                 <div class="form-group">
                                     <label>帐号</label>
-                                    <input type="text" class="form-control" placeholder="输入用户名" value="{[{ .User }]}"
-                                        readonly>
+                                    <input type="text" class="form-control" placeholder="输入用户名" v-model="form.User">
                                 </div>
                                 <div class="form-group">
                                     <label>密码</label>
-                                    <input type="password" class="form-control" placeholder="密码" name="Pass">
+                                    <input type="password" class="form-control" placeholder="密码" v-model="form.Pass">
                                 </div>
                                 <div class="form-group">
                                     <label>邮箱</label>
-                                    <input type="email" class="form-control" placeholder="输入邮箱地址" name="Email"
-                                        value="{[{ .Email }]}">
+                                    <input type="email" class="form-control" placeholder="输入邮箱地址" v-model="form.Email">
                                 </div>
                             </div>
                             <!-- /.box-body -->
@@ -50,12 +47,27 @@
         components: {
             DefaultLayout
         },
-        data() { return {} },
+        data() {
+            return {
+                form: {
+                    User: "",
+                    Pass: "",
+                    Email: "",
+                }
+            }
+        },
         props: {},
         created() { },
         mounted() { },
         destroyed() { },
-        methods: {},
+        methods: {
+            submit() {
+                this.$post("/admin_user/add", this.form, x => {
+                    if (x.no != 0) return alert(x.data);
+                    this.$router.push('/admin/user/list');
+                })
+            }
+        },
         filters: {},
         watch: {},
         computed: {},

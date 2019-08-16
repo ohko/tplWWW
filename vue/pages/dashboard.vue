@@ -71,9 +71,6 @@
             </div>
             <!-- /.col -->
          </div>
-
-         <div>JSON:{[{ .|json }]}</div>
-         <div>User:{[{ .User }]}</div>
       </section>
    </DefaultLayout>
 </template>

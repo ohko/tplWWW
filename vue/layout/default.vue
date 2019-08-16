@@ -55,8 +55,6 @@
 </template>
 
 <script>
-   import { getJSON } from "../core/request.js"
-
    export default {
       components: {},
       data() {
@@ -65,23 +63,28 @@
          }
       },
       props: {},
+      beforeCreate() {
+         setTimeout(_ => {
+            $('.main-sidebar').tree()
+            $(".content-wrapper").height(window.innerHeight - 51)
+            $(".sidebar a").each(function (i, a) {
+               if (a.href.split("?")[0] == location.href.split("?")[0]) {
+                  $(a).parents("li").addClass("active menu-open");
+               }
+            });
+         })
+      },
       created() {
-         getJSON('/admin/get_menu', null, x => {
+         this.$getJSON('/admin/get_adm_menu', null, x => {
             if (x.no != 0) return alert(x.data);
             this.menus = x.data;
          });
       },
-      mounted() {
-         $(".sidebar a").each(function (i, a) {
-            if (a.href.split("?")[0] == location.href.split("?")[0]) {
-               $(a).parents("li").addClass("active menu-open");
-            }
-         });
-      },
+      mounted() { },
       destroyed() { },
       methods: {
-         logout: function () {
-            getJSON('/admin/logout', null, x => {
+         logout() {
+            this.$getJSON('/admin/logout', null, x => {
                if (x.no != 0) return alert(x.data);
                this.$root.go('/admin/login')
             });

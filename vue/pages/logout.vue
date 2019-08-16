@@ -10,9 +10,9 @@
     data() { return {} },
     props: {},
     created() {
-      getJSON("/admin/logout", null, x => {
+      this.$getJSON("/admin/logout", null, x => {
         if (x.no != 0) return alert(x.data);
-        this.$root.go('/admin/login')
+        this.$router.push('/admin/login')
       });
       return false;
     },
