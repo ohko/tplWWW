@@ -47,7 +47,7 @@
          <div class="pull-right hidden-xs">
             <b>Version</b> 1.0.0
          </div>
-         <strong>Copyright &copy; 2019.</strong> All rights reserved.
+         <strong>Copyright &copy; 2019.</strong> All rights reserved. {{clickCount}}
       </footer>
 
       <div class="control-sidebar-bg"></div>
@@ -80,7 +80,9 @@
             this.menus = x.data;
          });
       },
-      mounted() { },
+      mounted() {
+         this.$store.commit("incrementClickCount", { x: 1 })
+      },
       destroyed() { },
       methods: {
          logout() {
@@ -92,6 +94,10 @@
       },
       filters: {},
       watch: {},
-      computed: {},
+      computed: {
+         clickCount() {
+            return this.$store.state.clickCount
+         }
+      },
    }
 </script>
