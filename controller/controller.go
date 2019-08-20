@@ -18,8 +18,8 @@ var (
 	ll          *logger.Logger
 	sessionName = "TPLER"
 
-	users   = model.NewUser()
-	members = model.NewMember()
+	dbUser   = model.NewUser()
+	dbMember = model.NewMember()
 )
 
 type controller struct{}
@@ -29,7 +29,7 @@ func (o *controller) renderAdminError(ctx *hst.Context, data interface{}) {
 	if ctx.IsAjax() {
 		ctx.JSON2(200, 1, data)
 	}
-	ctx.HTML2(200, "layout/admin.html", data, "admin/error.html")
+	ctx.HTML2(200, "layout/empty.html", data, "admin/error.html")
 }
 
 // 渲染成功页面

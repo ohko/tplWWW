@@ -53,13 +53,13 @@ func (o *Oauth2Controller) Callback(ctx *hst.Context) {
 	ll.Log0Debug("Callback:", ctx.R.Method, ctx.R.RequestURI, ctx.R.Form.Encode())
 	state := ctx.R.FormValue("state")
 	if state != oauthStateString {
-		o.renderAdminError(ctx, fmt.Sprintf("invalid oauth state, expected '%s', got '%s'\n", oauthStateString, state))
+		ctx.HTML2(200, "layout/empty.html", fmt.Sprintf("invalid oauth state, expected '%s', got '%s'\n", oauthStateString, state), "admin/oauth2error.html")
 		return
 	}
 
 	errorMsg := ctx.R.FormValue("error")
 	if errorMsg != "" {
-		o.renderAdminError(ctx, errorMsg)
+		ctx.HTML2(200, "layout/empty.html", errorMsg, "admin/oauth2error.html")
 	}
 
 	code := ctx.R.FormValue("code")

@@ -27,7 +27,7 @@ func (o *AdminController) Login(ctx *hst.Context) {
 	pass := ctx.R.FormValue("Password")
 	callback := ctx.R.FormValue("callback")
 
-	if err := members.Check(user, pass); err != nil {
+	if err := dbMember.Check(user, pass); err != nil {
 		ctx.JSON2(200, 1, err.Error())
 	}
 
@@ -80,7 +80,7 @@ func (o *AdminController) Password(ctx *hst.Context) {
 		User: m.(string),
 		Pass: string(util.Hash([]byte(newPass))),
 	}
-	if err := members.Save(u); err != nil {
+	if err := dbMember.Save(u); err != nil {
 		o.renderAdminError(ctx, err.Error())
 	}
 	if ctx.IsAjax() {

@@ -2,6 +2,7 @@ package model
 
 import (
 	"os"
+	"path/filepath"
 	"time"
 	"tpler/util"
 
@@ -37,6 +38,7 @@ func Init(lll *logger.Logger, dbPath string) error {
 func initDB(dbPath string) error {
 	var err error
 
+	os.MkdirAll(filepath.Dir(dbPath), 0755)
 	if db, err = gorm.Open("sqlite3", dbPath); err != nil {
 		return err
 	}
