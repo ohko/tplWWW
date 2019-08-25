@@ -26,6 +26,17 @@ func (o *Setting) List() ([]*Setting, error) {
 	return us, nil
 }
 
+// GetSetting 获取配置，错误或没有返回设定的默认值
+func (o *Setting) GetSetting(key string, defaultValue *Setting) *Setting {
+	var u Setting
+
+	if err := db.Find(&u, &Setting{Key: key}).Error; err != nil {
+		return defaultValue
+	}
+
+	return &u
+}
+
 // Get ...
 func (o *Setting) Get(key string) (*Setting, error) {
 	var u Setting

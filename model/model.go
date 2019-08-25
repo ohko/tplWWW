@@ -8,6 +8,8 @@ import (
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite" // ...
+
+	// _ "github.com/jinzhu/gorm/dialects/postgres" // ...
 	"github.com/ohko/logger"
 )
 
@@ -40,6 +42,7 @@ func initDB(dbPath string) error {
 
 	os.MkdirAll(filepath.Dir(dbPath), 0755)
 	if db, err = gorm.Open("sqlite3", dbPath); err != nil {
+		// if db, err = gorm.Open("postgres", "postgres://user:pass@host/database?sslmode=disable"); err != nil {
 		return err
 	}
 	if os.Getenv("DEBUG") != "" {
@@ -53,10 +56,27 @@ func initDB(dbPath string) error {
 	if err := db.AutoMigrate(&Member{}, &User{}, &Setting{}).Error; err != nil {
 		return err
 	}
+
 	var m Member
 	if err := db.First(&m).Error; err != nil {
 		if err := db.Save(&Member{User: "admin", Pass: string(util.Hash([]byte("admin")))}).Error; err != nil {
 			return err
+		}
+	}
+
+	// 初始化系统配置
+	defaultSetting := []Setting{
+		Setting{Key: "Int1", Int: 1},
+		Setting{Key: "String2", String: "string2"},
+		Setting{Key: "Bool3", Bool: true},
+	}
+	for _, v := range defaultSetting {
+		var d Setting
+		if err := db.First(&d, &Setting{Key: v.Key}).Error; err != nil {
+			ll.Log0Debug(v.Key)
+			if err := db.Save(&v).Error; err != nil {
+				return err
+			}
 		}
 	}
 	return nil

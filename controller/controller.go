@@ -83,11 +83,13 @@ func Start(addr, sessionPath, oauth2Server string, lll *logger.Logger) {
 	// 注册自动路由
 	s.RegisterHandle(
 		[]hst.HandlerFunc{checkAdminLogined},
-		&IndexController{},
 		&AdminController{},
 		&AdminUserController{},
 		&AdminSettingController{},
 		&Oauth2Controller{},
+	)
+	s.RegisterHandle(nil,
+		&IndexController{},
 	)
 
 	// 设置模版函数
@@ -113,8 +115,6 @@ func checkAdminLogined(ctx *hst.Context) {
 	if u, err := url.ParseRequestURI(ctx.R.RequestURI); err == nil {
 		// 排除路径
 		for _, v := range []string{
-			"/",
-			"/adm/",
 			"/admin/login",
 			"/oauth2/login",
 			"/oauth2/callback",

@@ -1,8 +1,8 @@
 // 异步请求
 
-const FAKE = process.env.NODE_ENV != 'development'
-// const BASE_URL = ''
-const BASE_URL = 'http://127.0.0.1:8080'
+const FAKE = process.env.NODE_ENV == 'development'
+const BASE_URL = ''
+// const BASE_URL = 'http://127.0.0.1:8080'
 
 const getJSON = (url, params, callback) => {
    if (FAKE) {
