@@ -18,6 +18,7 @@ func (o *Menu) GetAdminMenu(who string) []Menu {
 				Menu{Class: "fa-circle-o", Text: "表单", Href: "/admin/form"},
 				Menu{Class: "fa-circle-o", Text: "表格", Href: "/admin/table"},
 			}},
+		Menu{Class: "fa-home", Text: "系统配置", Href: "/admin_setting/list"},
 		Menu{Class: "fa-home", Text: "修改密码", Href: "/admin/password"},
 		Menu{Class: "fa-share", Text: "退出:" + who, Href: "javascript:vueMenu.logout()"},
 	}
@@ -33,6 +34,7 @@ func (o *Menu) GetAdmMenu(who string) []Menu {
 				Menu{Class: "fa-circle-o", Text: "表单", Href: "#/admin/form"},
 				Menu{Class: "fa-circle-o", Text: "表格", Href: "#/admin/table"},
 			}},
+		Menu{Class: "fa-home", Text: "系统配置", Href: "#/admin/setting/list"},
 		Menu{Class: "fa-home", Text: "修改密码", Href: "#/admin/password"},
 		Menu{Class: "fa-share", Text: "退出:" + who, Href: "#/admin/logout"},
 	}

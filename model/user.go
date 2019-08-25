@@ -46,6 +46,10 @@ func (o *User) List() ([]*User, error) {
 func (o *User) Get(user string) (*User, error) {
 	var u User
 
+	if user == "" {
+		return nil, errors.New("user error")
+	}
+
 	if err := db.Find(&u, &User{User: user}).Error; err != nil {
 		return nil, err
 	}
@@ -64,5 +68,8 @@ func (o *User) Save(u *User) error {
 
 // Delete ...
 func (o *User) Delete(user string) error {
+	if user == "" {
+		return errors.New("user error")
+	}
 	return db.Delete(&User{User: user}).Error
 }

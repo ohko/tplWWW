@@ -18,8 +18,9 @@ var (
 	ll          *logger.Logger
 	sessionName = "TPLER"
 
-	dbUser   = model.NewUser()
-	dbMember = model.NewMember()
+	dbUser    = model.NewUser()
+	dbMember  = model.NewMember()
+	dbSetting = model.NewSetting()
 )
 
 type controller struct{}
@@ -85,6 +86,7 @@ func Start(addr, sessionPath, oauth2Server string, lll *logger.Logger) {
 		&IndexController{},
 		&AdminController{},
 		&AdminUserController{},
+		&AdminSettingController{},
 		&Oauth2Controller{},
 	)
 

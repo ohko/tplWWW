@@ -48,6 +48,20 @@ func (o *AdminUserController) Add(ctx *hst.Context) {
 	http.Redirect(ctx.W, ctx.R, "/admin_user/list", http.StatusFound)
 }
 
+// Detail 查看用户
+func (o *AdminUserController) Detail(ctx *hst.Context) {
+	user := ctx.R.FormValue("User")
+	u, err := dbUser.Get(user)
+	if err != nil {
+		o.renderAdminError(ctx, err.Error())
+	}
+
+	if ctx.IsAjax() {
+		ctx.JSON2(200, 0, u)
+	}
+	o.renderAdmin(ctx, u, "admin/user/edit.html")
+}
+
 // Edit 编辑用户
 func (o *AdminUserController) Edit(ctx *hst.Context) {
 	user := ctx.R.FormValue("User")

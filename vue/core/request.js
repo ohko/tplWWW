@@ -1,8 +1,8 @@
 // 异步请求
 
-const FAKE = process.env.NODE_ENV == 'development'
-const BASE_URL = ''
-// const BASE_URL = 'http://127.0.0.1:8080'
+const FAKE = process.env.NODE_ENV != 'development'
+// const BASE_URL = ''
+const BASE_URL = 'http://127.0.0.1:8080'
 
 const getJSON = (url, params, callback) => {
    if (FAKE) {
@@ -14,6 +14,7 @@ const getJSON = (url, params, callback) => {
 
    $.getJSON(BASE_URL + url, params, x => {
       if (x.no == -1 && window.vue) return window.vue.$router.push({ name: 'login', params: { callback: encodeURIComponent(location.href) } })
+      if (x.no != 0) return alert(x.data)
       callback(x)
    });
 }
@@ -37,10 +38,11 @@ export default class Request {
    static install(Vue, options) {
 
       $.ajaxSetup({
+         dataType: 'json',
          crossDomain: true,
          xhrFields: {
             withCredentials: true
-         },
+         }
          // username: 'test',
          // password: 'test'
       });

@@ -6,24 +6,27 @@
                     <!-- general form elements -->
                     <div class="box box-primary">
                         <div class="box-header with-border">
-                            <h3 class="box-title">修改用户</h3>
+                            <h3 class="box-title">添加配置</h3>
                         </div>
                         <!-- /.box-header -->
                         <!-- form start -->
                         <form role="form" @submit.prevent="submit">
                             <div class="box-body">
                                 <div class="form-group">
-                                    <label>帐号</label>
-                                    <input type="text" class="form-control" placeholder="输入用户名" v-model="form.User"
-                                        readonly>
+                                    <label>关键词</label>
+                                    <input type="text" class="form-control" placeholder="输入关键词" v-model="form.Key">
                                 </div>
                                 <div class="form-group">
-                                    <label>密码</label>
-                                    <input type="password" class="form-control" placeholder="密码" v-model="form.Pass">
+                                    <label>数字型</label>
+                                    <input type="number" class="form-control" placeholder="输入数字型" v-model="form.Int">
                                 </div>
                                 <div class="form-group">
-                                    <label>邮箱</label>
-                                    <input type="email" class="form-control" placeholder="输入邮箱地址" v-model="form.Email">
+                                    <label>逻辑型</label>
+                                    <input type="checkbox" v-model="form.Bool">
+                                </div>
+                                <div class="form-group">
+                                    <label>字符串</label>
+                                    <input type="text" class="form-control" placeholder="输入字符串" v-model="form.String">
                                 </div>
                             </div>
                             <!-- /.box-body -->
@@ -51,26 +54,22 @@
         data() {
             return {
                 form: {
-                    User: "",
-                    Pass: "",
-                    Email: "",
+                    Key: "",
+                    Int: 0,
+                    String: "",
+                    Bool: false,
                 }
             }
         },
         props: {},
         created() { },
-        mounted() {
-            this.$getJSON('/admin_user/detail', { User: this.$route.params.user }, x => {
-                if (x.no != 0) return alert(x.msg)
-                this.form = x.data
-            })
-        },
+        mounted() { },
         destroyed() { },
         methods: {
             submit() {
-                this.$post('/admin_user/edit', this.form, x => {
-                    if (x.no != 0) return alert(x.msg)
-                    this.$router.push('/admin/user/list')
+                this.$post("/admin_setting/add", this.form, x => {
+                    if (x.no != 0) return alert(x.data);
+                    this.$router.push('/admin/setting/list');
                 })
             }
         },
