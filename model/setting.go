@@ -7,6 +7,7 @@ import (
 // Setting 配置模型
 type Setting struct {
 	Key    string `gorm:"PRIMARY_KEY"`
+	Desc   string // 说明
 	Int    int
 	String string
 	Bool   bool

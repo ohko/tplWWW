@@ -11,6 +11,7 @@
                         <thead>
                             <tr>
                                 <th>Key</th>
+                                <th>Desc</th>
                                 <th>Int</th>
                                 <th>String</th>
                                 <th>Bool</th>
@@ -20,6 +21,7 @@
                         <tbody>
                             <tr v-for="setting in list">
                                 <td>{{setting.Key}}</td>
+                                <td>{{setting.Desc}}</td>
                                 <td>{{setting.Int}}</td>
                                 <td>{{setting.String}}</td>
                                 <td>{{setting.Bool}}</td>

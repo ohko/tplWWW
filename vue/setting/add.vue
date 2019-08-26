@@ -17,6 +17,10 @@
                                     <input type="text" class="form-control" placeholder="输入关键词" v-model="form.Key">
                                 </div>
                                 <div class="form-group">
+                                    <label>说明</label>
+                                    <input type="text" class="form-control" placeholder="输入说明" v-model="form.Desc">
+                                </div>
+                                <div class="form-group">
                                     <label>数字型</label>
                                     <input type="number" class="form-control" placeholder="输入数字型" v-model="form.Int">
                                 </div>
@@ -55,6 +59,7 @@
             return {
                 form: {
                     Key: "",
+                    Desc: "",
                     Int: 0,
                     String: "",
                     Bool: false,

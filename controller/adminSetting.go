@@ -36,6 +36,7 @@ func (o *AdminSettingController) Add(ctx *hst.Context) {
 	i, _ := strconv.Atoi(ctx.R.FormValue("Int"))
 	u := &model.Setting{
 		Key:    ctx.R.FormValue("Key"),
+		Desc:   ctx.R.FormValue("Desc"),
 		Int:    i,
 		String: ctx.R.FormValue("String"),
 		Bool:   ctx.R.FormValue("Bool") == "on" || ctx.R.FormValue("Bool") == "true",
@@ -78,6 +79,7 @@ func (o *AdminSettingController) Edit(ctx *hst.Context) {
 		o.renderAdmin(ctx, u, "admin/setting/edit.html")
 	}
 
+	u.Desc = ctx.R.FormValue("Desc")
 	u.Int, _ = strconv.Atoi(ctx.R.FormValue("Int"))
 	u.String = ctx.R.FormValue("String")
 	u.Bool = (ctx.R.FormValue("Bool") == "on" || ctx.R.FormValue("Bool") == "true")
