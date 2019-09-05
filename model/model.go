@@ -1,6 +1,7 @@
 package model
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"time"
@@ -61,6 +62,13 @@ func initDB(dbPath string) error {
 	if err := db.First(&m).Error; err != nil {
 		if err := db.Save(&Member{User: "admin", Pass: string(util.Hash([]byte("admin")))}).Error; err != nil {
 			return err
+		}
+
+		// 创建50个测试账号
+		for i := 0; i < 50; i++ {
+			if err := db.Save(&User{User: fmt.Sprintf("user-%d", i), Email: fmt.Sprintf("email-%d@xx.com", i)}).Error; err != nil {
+				return err
+			}
 		}
 	}
 

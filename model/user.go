@@ -42,6 +42,19 @@ func (o *User) List() ([]*User, error) {
 	return us, nil
 }
 
+// ListPageDemo ...
+func (o *User) ListPageDemo(offset, limit int) (int, []*User, error) {
+	var count int
+	if err := db.Model(&User{}).Count(&count).Error; err != nil {
+		return 0, nil, err
+	}
+	var us []*User
+	if err := db.Order("user").Offset(offset).Limit(limit).Find(&us).Error; err != nil {
+		return 0, nil, err
+	}
+	return count, us, nil
+}
+
 // Get ...
 func (o *User) Get(user string) (*User, error) {
 	var u User

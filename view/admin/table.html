@@ -441,6 +441,17 @@
                 <!-- /.box-body -->
             </div>
             <!-- /.box -->
+
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title">Data Table With Ajax Request</h3>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <table id="example2" class="table table-bordered table-striped table-hover"></table>
+                </div>
+                <!-- /.box-body -->
+            </div>
         </div>
         <!-- /.col -->
     </div>
@@ -448,14 +459,40 @@
 
 <script>
     $(function () {
-        $('#example1').DataTable()
-        $('#example2').DataTable({
+        $('#example1').DataTable({
+            'pageLength': 5,
             'paging': true,
             'lengthChange': false,
             'searching': false,
             'ordering': true,
             'info': true,
             'autoWidth': false
+        })
+
+        $('#example2').DataTable({
+            "processing": true,
+            "serverSide": true,
+            "ajax": "/admin/table",
+            "columns": [
+                { title: "User", data: "User" },
+                {
+                    title: "Pass", render: function (data, type, row) {
+                        return "******"
+                    }
+                },
+                {
+                    title: "Email", render: function (data, type, row) {
+                        return row.Email.split("@")[0] + "@this.com";
+                    }
+                },
+            ],
+            'pageLength': 5,
+            'paging': true,
+            'lengthChange': false,
+            'searching': false,
+            'ordering': false,
+            'info': true,
+            'autoWidth': true
         })
     })
 </script>

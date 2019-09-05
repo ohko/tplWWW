@@ -2,6 +2,7 @@ package controller
 
 import (
 	"net/http"
+	"strconv"
 
 	"tpler/model"
 	"tpler/util"
@@ -110,5 +111,22 @@ func (o *AdminController) Form(ctx *hst.Context) {
 
 // Table ...
 func (o *AdminController) Table(ctx *hst.Context) {
+	if ctx.IsAjax() {
+		draw, _ := strconv.Atoi(ctx.R.FormValue("draw"))
+		start, _ := strconv.Atoi(ctx.R.FormValue("start"))
+		length, _ := strconv.Atoi(ctx.R.FormValue("length"))
+		count, us, err := dbUser.ListPageDemo(start, length)
+		if err != nil {
+			o.renderAdminError(ctx, err.Error())
+		}
+
+		ctx.JSON(200, map[string]interface{}{
+			"draw":            draw,
+			"recordsTotal":    count,
+			"recordsFiltered": count,
+			"data":            us,
+		})
+	}
+
 	o.renderAdmin(ctx, nil, "admin/table.html")
 }
