@@ -448,6 +448,10 @@
                 </div>
                 <!-- /.box-header -->
                 <div class="box-body">
+                    <form onsubmit="return search(event)">
+                        Search: <input name="search2" placeholder="keyword">
+                        <input type="submit" class="btn btn-primary" value="Search">
+                    </form>
                     <table id="example2" class="table table-bordered table-striped table-hover"></table>
                 </div>
                 <!-- /.box-body -->
@@ -458,6 +462,14 @@
 </section>
 
 <script>
+    var dt2;
+    var url = "/admin/table";
+    function search(event) {
+        event.preventDefault()
+        var keyword = document.querySelector("input[name=search2]").value
+        dt2.ajax.url(url + "?keyword=" + encodeURIComponent(keyword))
+        dt2.ajax.reload()
+    }
     $(function () {
         $('#example1').DataTable({
             'pageLength': 5,
@@ -469,10 +481,10 @@
             'autoWidth': false
         })
 
-        $('#example2').DataTable({
+        dt2 = $('#example2').DataTable({
             "processing": true,
             "serverSide": true,
-            "ajax": "/admin/table",
+            "ajax": url,
             "columns": [
                 { title: "User", data: "User" },
                 {
@@ -489,6 +501,7 @@
             'pageLength': 5,
             'paging': true,
             'lengthChange': false,
+            'searchDelay': 2000,
             'searching': false,
             'ordering': false,
             'info': true,
