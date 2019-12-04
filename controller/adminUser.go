@@ -2,6 +2,7 @@ package controller
 
 import (
 	"net/http"
+	"strconv"
 
 	"tpler/model"
 	"tpler/util"
@@ -16,16 +17,24 @@ type AdminUserController struct {
 
 // List 用户列表
 func (o *AdminUserController) List(ctx *hst.Context) {
-	us, err := dbUser.List()
-	if err != nil {
-		o.renderAdminError(ctx, err.Error())
-	}
-
 	if ctx.IsAjax() {
-		ctx.JSON2(200, 0, us)
+		draw, _ := strconv.Atoi(ctx.R.FormValue("draw"))
+		start, _ := strconv.Atoi(ctx.R.FormValue("start"))
+		length, _ := strconv.Atoi(ctx.R.FormValue("length"))
+		count, us, err := dbUser.List(start, length)
+		if err != nil {
+			o.renderAdminError(ctx, err.Error())
+		}
+
+		ctx.JSON(200, map[string]interface{}{
+			"draw":            draw,
+			"recordsTotal":    count,
+			"recordsFiltered": count,
+			"data":            us,
+		})
 	}
 
-	o.renderAdmin(ctx, map[string]interface{}{"us": us}, "admin/user/list.html")
+	o.renderAdmin(ctx, nil, "admin/user/list.html")
 }
 
 // Add 增加用户

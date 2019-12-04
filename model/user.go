@@ -34,12 +34,17 @@ func (o *User) Check(user, pass string) error {
 }
 
 // List ...
-func (o *User) List() ([]*User, error) {
-	var us []*User
-	if err := db.Find(&us).Error; err != nil {
-		return nil, err
+func (o *User) List(offset, limit int) (int, []*User, error) {
+	var count int
+	if err := db.Model(&User{}).Count(&count).Error; err != nil {
+		return 0, nil, err
 	}
-	return us, nil
+
+	var us []*User
+	if err := db.Offset(offset).Limit(limit).Find(&us).Error; err != nil {
+		return 0, nil, err
+	}
+	return count, us, nil
 }
 
 // ListPageDemo ...
