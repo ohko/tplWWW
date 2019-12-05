@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
-	"tpler/util"
+	"tpler/common"
 )
 
 // Member 管理员模型
@@ -21,7 +21,7 @@ func ResetAdmin(newPass string) error {
 
 	if err := db.Save(&Member{
 		User: "admin",
-		Pass: string(util.Hash([]byte(newPass))),
+		Pass: string(common.Hash([]byte(newPass))),
 	}).Error; err != nil {
 		return err
 	}
@@ -40,7 +40,7 @@ func (o *Member) Check(user, pass string) error {
 	var u Member
 	if err := db.First(&u, &Member{
 		User: user,
-		Pass: string(util.Hash([]byte(pass))),
+		Pass: string(common.Hash([]byte(pass))),
 	}).Error; err != nil {
 		return err
 	}

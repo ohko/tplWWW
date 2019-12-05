@@ -15,7 +15,7 @@ type AdminSettingController struct {
 
 // List 配置列表
 func (o *AdminSettingController) List(ctx *hst.Context) {
-	us, err := dbSetting.List()
+	us, err := model.DBSetting.List()
 	if err != nil {
 		o.renderAdminError(ctx, err.Error())
 	}
@@ -41,7 +41,7 @@ func (o *AdminSettingController) Add(ctx *hst.Context) {
 		String: ctx.R.FormValue("String"),
 		Bool:   ctx.R.FormValue("Bool") == "on" || ctx.R.FormValue("Bool") == "true",
 	}
-	if err := dbSetting.Save(u); err != nil {
+	if err := model.DBSetting.Save(u); err != nil {
 		o.renderAdminError(ctx, err.Error())
 	}
 	if ctx.IsAjax() {
@@ -53,7 +53,7 @@ func (o *AdminSettingController) Add(ctx *hst.Context) {
 // Detail 查看配置
 func (o *AdminSettingController) Detail(ctx *hst.Context) {
 	key := ctx.R.FormValue("Key")
-	u, err := dbSetting.Get(key)
+	u, err := model.DBSetting.Get(key)
 	if err != nil {
 		o.renderAdminError(ctx, err.Error())
 	}
@@ -67,7 +67,7 @@ func (o *AdminSettingController) Detail(ctx *hst.Context) {
 // Edit 编辑配置
 func (o *AdminSettingController) Edit(ctx *hst.Context) {
 	key := ctx.R.FormValue("Key")
-	u, err := dbSetting.Get(key)
+	u, err := model.DBSetting.Get(key)
 	if err != nil {
 		o.renderAdminError(ctx, err.Error())
 	}
@@ -95,7 +95,7 @@ func (o *AdminSettingController) Edit(ctx *hst.Context) {
 // Delete 删除配置
 func (o *AdminSettingController) Delete(ctx *hst.Context) {
 	key := ctx.R.FormValue("Key")
-	if err := dbSetting.Delete(key); err != nil {
+	if err := model.DBSetting.Delete(key); err != nil {
 		o.renderAdminError(ctx, err.Error())
 	}
 

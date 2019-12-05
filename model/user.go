@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"errors"
 
-	"tpler/util"
+	"tpler/common"
 )
 
 // User 用户模型
@@ -26,7 +26,7 @@ func (o *User) Check(user, pass string) error {
 		return err
 	}
 
-	if bytes.Compare([]byte(u.Pass), util.Hash([]byte(pass))) != 0 {
+	if bytes.Compare([]byte(u.Pass), common.Hash([]byte(pass))) != 0 {
 		return errors.New("password error")
 	}
 
@@ -53,6 +53,7 @@ func (o *User) ListPageDemo(offset, limit int) (int, []*User, error) {
 	if err := db.Model(&User{}).Count(&count).Error; err != nil {
 		return 0, nil, err
 	}
+
 	var us []*User
 	if err := db.Order("user").Offset(offset).Limit(limit).Find(&us).Error; err != nil {
 		return 0, nil, err

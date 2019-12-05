@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"strconv"
 
+	"tpler/common"
 	"tpler/model"
-	"tpler/util"
 
 	"github.com/ohko/hst"
 )
@@ -21,7 +21,7 @@ func (o *AdminUserController) List(ctx *hst.Context) {
 		draw, _ := strconv.Atoi(ctx.R.FormValue("draw"))
 		start, _ := strconv.Atoi(ctx.R.FormValue("start"))
 		length, _ := strconv.Atoi(ctx.R.FormValue("length"))
-		count, us, err := dbUser.List(start, length)
+		count, us, err := model.DBUser.List(start, length)
 		if err != nil {
 			o.renderAdminError(ctx, err.Error())
 		}
@@ -45,10 +45,10 @@ func (o *AdminUserController) Add(ctx *hst.Context) {
 
 	u := &model.User{
 		User:  ctx.R.FormValue("User"),
-		Pass:  string(util.Hash([]byte(ctx.R.FormValue("Pass")))),
+		Pass:  string(common.Hash([]byte(ctx.R.FormValue("Pass")))),
 		Email: ctx.R.FormValue("Email"),
 	}
-	if err := dbUser.Save(u); err != nil {
+	if err := model.DBUser.Save(u); err != nil {
 		o.renderAdminError(ctx, err.Error())
 	}
 	if ctx.IsAjax() {
@@ -60,7 +60,7 @@ func (o *AdminUserController) Add(ctx *hst.Context) {
 // Detail 查看用户
 func (o *AdminUserController) Detail(ctx *hst.Context) {
 	user := ctx.R.FormValue("User")
-	u, err := dbUser.Get(user)
+	u, err := model.DBUser.Get(user)
 	if err != nil {
 		o.renderAdminError(ctx, err.Error())
 	}
@@ -74,7 +74,7 @@ func (o *AdminUserController) Detail(ctx *hst.Context) {
 // Edit 编辑用户
 func (o *AdminUserController) Edit(ctx *hst.Context) {
 	user := ctx.R.FormValue("User")
-	u, err := dbUser.Get(user)
+	u, err := model.DBUser.Get(user)
 	if err != nil {
 		o.renderAdminError(ctx, err.Error())
 	}
@@ -88,7 +88,7 @@ func (o *AdminUserController) Edit(ctx *hst.Context) {
 
 	pass := ctx.R.FormValue("Pass")
 	if pass != "" {
-		u.Pass = string(util.Hash([]byte(pass)))
+		u.Pass = string(common.Hash([]byte(pass)))
 	}
 	u.Email = ctx.R.FormValue("Email")
 	if err := u.Save(u); err != nil {
@@ -103,7 +103,7 @@ func (o *AdminUserController) Edit(ctx *hst.Context) {
 // Delete 删除用户
 func (o *AdminUserController) Delete(ctx *hst.Context) {
 	user := ctx.R.FormValue("User")
-	if err := dbUser.Delete(user); err != nil {
+	if err := model.DBUser.Delete(user); err != nil {
 		o.renderAdminError(ctx, err.Error())
 	}
 

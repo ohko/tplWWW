@@ -5,40 +5,30 @@ import (
 	"os"
 	"path/filepath"
 	"time"
-	"tpler/util"
+	"tpler/common"
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite" // ...
-
-	// _ "github.com/jinzhu/gorm/dialects/postgres" // ...
 	"github.com/ohko/logger"
+	// _ "github.com/jinzhu/gorm/dialects/postgres" // ...
 )
 
+// ...
 var (
-	ll  *logger.Logger
-	db  *gorm.DB
-	loc *time.Location
+	db        *gorm.DB
+	DBUser    = NewUser()
+	DBMember  = NewMember()
+	DBSetting = NewSetting()
 )
 
-// Init ...
-func Init(lll *logger.Logger, dbPath string) error {
-	ll = lll
+type model struct{}
 
-	var err error
-	loc, err = time.LoadLocation("Asia/Shanghai")
-	if err != nil {
-		return err
-	}
-
-	if err := initDB(dbPath); err != nil {
-		return err
-	}
-
-	return nil
+func (o *model) Print(arg ...interface{}) {
+	common.LL.LogCalldepth(2, logger.LoggerLevel0Debug, arg[3:]...)
 }
 
-// initDB 初始化数据库
-func initDB(dbPath string) error {
+// Init 初始化数据库
+func Init(dbPath string) error {
 	var err error
 
 	os.MkdirAll(filepath.Dir(dbPath), 0755)
@@ -46,12 +36,12 @@ func initDB(dbPath string) error {
 		// if db, err = gorm.Open("postgres", "postgres://user:pass@host/database?sslmode=disable"); err != nil {
 		return err
 	}
-	if os.Getenv("DEBUG") != "" {
-		db.LogMode(true)
-	}
+	db.SetLogger(&model{})
+	db.LogMode(os.Getenv("DEBUG") != "")
 	db.SingularTable(true)
+	db.DB().SetMaxOpenConns(2)
 	db.SetNowFuncOverride(func() time.Time {
-		return time.Now().In(loc)
+		return time.Now().In(common.TimeLocation)
 	})
 
 	if err := db.AutoMigrate(&Member{}, &User{}, &Setting{}).Error; err != nil {
@@ -60,7 +50,7 @@ func initDB(dbPath string) error {
 
 	var m Member
 	if err := db.First(&m).Error; err != nil {
-		if err := db.Save(&Member{User: "admin", Pass: string(util.Hash([]byte("admin")))}).Error; err != nil {
+		if err := db.Save(&Member{User: "admin", Pass: string(common.Hash([]byte("admin")))}).Error; err != nil {
 			return err
 		}
 
@@ -74,14 +64,14 @@ func initDB(dbPath string) error {
 
 	// 初始化系统配置
 	defaultSetting := []Setting{
-		Setting{Key: "Int1", Int: 1},
-		Setting{Key: "String2", String: "string2"},
-		Setting{Key: "Bool3", Bool: true},
+		Setting{Key: "Int1", Type: 0, Int: 1},
+		Setting{Key: "String2", Type: 1, String: "string2"},
+		Setting{Key: "Bool3", Type: 2, Bool: true},
 	}
 	for _, v := range defaultSetting {
 		var d Setting
 		if err := db.First(&d, &Setting{Key: v.Key}).Error; err != nil {
-			ll.Log0Debug(v.Key)
+			common.LL.Log0Debug(v.Key)
 			if err := db.Save(&v).Error; err != nil {
 				return err
 			}

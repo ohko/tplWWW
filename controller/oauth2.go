@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"tpler/common"
 
 	"github.com/ohko/hst"
 	"golang.org/x/oauth2"
@@ -50,7 +51,7 @@ func (o *Oauth2Controller) Login(ctx *hst.Context) {
 
 // Callback oauth2登录授权返回
 func (o *Oauth2Controller) Callback(ctx *hst.Context) {
-	ll.Log0Debug("Callback:", ctx.R.Method, ctx.R.RequestURI, ctx.R.Form.Encode())
+	common.LL.Log0Debug("Callback:", ctx.R.Method, ctx.R.RequestURI, ctx.R.Form.Encode())
 	state := ctx.R.FormValue("state")
 	if state != oauthStateString {
 		ctx.HTML2(200, "layout/empty.html", fmt.Sprintf("invalid oauth state, expected '%s', got '%s'\n", oauthStateString, state), "admin/oauth2error.html")
@@ -64,7 +65,7 @@ func (o *Oauth2Controller) Callback(ctx *hst.Context) {
 
 	code := ctx.R.FormValue("code")
 	token, err := oauthConfig.Exchange(oauth2.NoContext, code)
-	ll.Log0Debug("Token:", fmt.Sprintf("%#v", token))
+	common.LL.Log0Debug("Token:", fmt.Sprintf("%#v", token))
 	if err != nil {
 		ctx.Data(200, err.Error())
 		return
@@ -80,7 +81,7 @@ func (o *Oauth2Controller) Callback(ctx *hst.Context) {
 	if err != nil {
 		ctx.Data(200, err.Error())
 	}
-	ll.Log0Debug("Userinfo:", string(contents))
+	common.LL.Log0Debug("Userinfo:", string(contents))
 
 	var rst struct {
 		No   int         `json:"no"`

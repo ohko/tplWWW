@@ -9,6 +9,8 @@
 ## 目录结构
 ```
 - root
+ ∟ api        程序接口/第三方服务
+ ∟ backend    后端自动化执行代码
  ∟ controller 业务逻辑Golang代码
  ∟ db         sqlite3数据库
  ∟ dist       前端开发的零时输出文件
@@ -28,6 +30,8 @@ git clone https://github.com/ohko/tpler.git
 ## Golang开发
 ```
 fswatch
+# 或
+DEBUG=1 go run .
 ```
 
 ## 前端vue开发

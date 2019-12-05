@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"strconv"
 
+	"tpler/common"
 	"tpler/model"
-	"tpler/util"
 
 	"github.com/ohko/hst"
 )
@@ -28,7 +28,7 @@ func (o *AdminController) Login(ctx *hst.Context) {
 	pass := ctx.R.FormValue("Password")
 	callback := ctx.R.FormValue("callback")
 
-	if err := dbMember.Check(user, pass); err != nil {
+	if err := model.DBMember.Check(user, pass); err != nil {
 		ctx.JSON2(200, 1, err.Error())
 	}
 
@@ -79,9 +79,9 @@ func (o *AdminController) Password(ctx *hst.Context) {
 	}
 	u := &model.Member{
 		User: m.(string),
-		Pass: string(util.Hash([]byte(newPass))),
+		Pass: string(common.Hash([]byte(newPass))),
 	}
-	if err := dbMember.Save(u); err != nil {
+	if err := model.DBMember.Save(u); err != nil {
 		o.renderAdminError(ctx, err.Error())
 	}
 	if ctx.IsAjax() {
@@ -115,7 +115,7 @@ func (o *AdminController) Table(ctx *hst.Context) {
 		draw, _ := strconv.Atoi(ctx.R.FormValue("draw"))
 		start, _ := strconv.Atoi(ctx.R.FormValue("start"))
 		length, _ := strconv.Atoi(ctx.R.FormValue("length"))
-		count, us, err := dbUser.ListPageDemo(start, length)
+		count, us, err := model.DBUser.ListPageDemo(start, length)
 		if err != nil {
 			o.renderAdminError(ctx, err.Error())
 		}

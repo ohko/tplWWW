@@ -7,20 +7,9 @@ import (
 	"net/url"
 	"strings"
 	"time"
-
-	"tpler/model"
+	"tpler/common"
 
 	"github.com/ohko/hst"
-	"github.com/ohko/logger"
-)
-
-var (
-	ll          *logger.Logger
-	sessionName = "TPLER"
-
-	dbUser    = model.NewUser()
-	dbMember  = model.NewMember()
-	dbSetting = model.NewSetting()
 )
 
 type controller struct{}
@@ -52,8 +41,7 @@ func (o *controller) renderDefault(ctx *hst.Context, data interface{}, names ...
 }
 
 // Start 启动WEB服务
-func Start(addr, sessionPath, oauth2Server string, lll *logger.Logger) {
-	ll = lll
+func Start(addr, sessionPath, oauth2Server string) {
 	oauth2Init(oauth2Server)
 	oauthStateString = time.Now().Format("20060102150405")
 
@@ -74,7 +62,7 @@ func Start(addr, sessionPath, oauth2Server string, lll *logger.Logger) {
 
 	// Session
 	// s.SetSession(hst.NewSessionMemory())
-	s.SetSession(hst.NewSessionFile("", "/", sessionName, sessionPath, time.Minute*30))
+	s.SetSession(hst.NewSessionFile("", "/", common.SessionName, sessionPath, time.Minute*30))
 
 	// 静态文件
 	s.StaticGzip("/public/", "./public/")
