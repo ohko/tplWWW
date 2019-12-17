@@ -10,7 +10,7 @@
 
       <aside class="main-sidebar">
          <section class="sidebar">
-            <ul class="sidebar-menu" data-widget="tree">
+            <ul class="sidebar-menu">
                <li class="header">MAIN NAVIGATION</li>
                <template v-for="(m,k) in menus">
                   <li class="treeview" v-if="m.Child" :menuID="k">
