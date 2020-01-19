@@ -37,6 +37,8 @@ DEBUG=1 go run .
 ## 前端vue开发
 ```
 parcel vue/index.html
+# 或
+parcel watch --public-url=/adm/ --out-dir=./dist/ vue/index.html
 ```
 
 ## 前端编译vue
