@@ -9,7 +9,7 @@ type Menu struct {
 }
 
 // GetAdminMenu ...
-func (o *Menu) GetAdminMenu(who string) []Menu {
+func (Menu) GetAdminMenu(who string) []Menu {
 	return []Menu{
 		Menu{Class: "fa-home", Text: "仪表盘", Href: "/admin/"},
 		Menu{Class: "fa-home", Text: "用户管理", Href: "/admin_user/list"},
@@ -25,7 +25,7 @@ func (o *Menu) GetAdminMenu(who string) []Menu {
 }
 
 // GetAdmMenu ...
-func (o *Menu) GetAdmMenu(who string) []Menu {
+func (Menu) GetAdmMenu(who string) []Menu {
 	return []Menu{
 		Menu{Class: "fa-home", Text: "仪表盘", Href: "#/admin/dashboard"},
 		Menu{Class: "fa-home", Text: "用户管理", Href: "#/admin/user/list"},

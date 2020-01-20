@@ -20,7 +20,7 @@ func NewUser() *User {
 }
 
 // Check ...
-func (o *User) Check(user, pass string) error {
+func (o User) Check(user, pass string) error {
 	u, err := o.Get(user)
 	if err != nil {
 		return err
@@ -34,7 +34,7 @@ func (o *User) Check(user, pass string) error {
 }
 
 // List ...
-func (o *User) List(offset, limit int) (int, []*User, error) {
+func (User) List(offset, limit int) (int, []*User, error) {
 	var count int
 	if err := db.Model(&User{}).Count(&count).Error; err != nil {
 		return 0, nil, err
@@ -48,7 +48,7 @@ func (o *User) List(offset, limit int) (int, []*User, error) {
 }
 
 // ListPageDemo ...
-func (o *User) ListPageDemo(offset, limit int) (int, []*User, error) {
+func (User) ListPageDemo(offset, limit int) (int, []*User, error) {
 	var count int
 	if err := db.Model(&User{}).Count(&count).Error; err != nil {
 		return 0, nil, err
@@ -62,7 +62,7 @@ func (o *User) ListPageDemo(offset, limit int) (int, []*User, error) {
 }
 
 // Get ...
-func (o *User) Get(user string) (*User, error) {
+func (User) Get(user string) (*User, error) {
 	var u User
 
 	if user == "" {
@@ -77,7 +77,7 @@ func (o *User) Get(user string) (*User, error) {
 }
 
 // Save ...
-func (o *User) Save(u *User) error {
+func (User) Save(u *User) error {
 	if u.User == "" {
 		return errors.New("user error")
 	}
@@ -86,7 +86,7 @@ func (o *User) Save(u *User) error {
 }
 
 // Delete ...
-func (o *User) Delete(user string) error {
+func (User) Delete(user string) error {
 	if user == "" {
 		return errors.New("user error")
 	}

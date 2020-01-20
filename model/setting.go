@@ -20,7 +20,7 @@ func NewSetting() *Setting {
 }
 
 // List ...
-func (o *Setting) List() ([]*Setting, error) {
+func (Setting) List() ([]*Setting, error) {
 	var us []*Setting
 	if err := db.Find(&us).Error; err != nil {
 		return nil, err
@@ -29,7 +29,7 @@ func (o *Setting) List() ([]*Setting, error) {
 }
 
 // GetSetting 获取配置，错误或没有返回设定的默认值
-func (o *Setting) GetSetting(key string, defaultValue *Setting) *Setting {
+func (Setting) GetSetting(key string, defaultValue *Setting) *Setting {
 	var u Setting
 
 	if err := db.Find(&u, &Setting{Key: key}).Error; err != nil {
@@ -40,7 +40,7 @@ func (o *Setting) GetSetting(key string, defaultValue *Setting) *Setting {
 }
 
 // Get ...
-func (o *Setting) Get(key string) (*Setting, error) {
+func (Setting) Get(key string) (*Setting, error) {
 	var u Setting
 
 	if err := db.Find(&u, &Setting{Key: key}).Error; err != nil {
@@ -51,7 +51,7 @@ func (o *Setting) Get(key string) (*Setting, error) {
 }
 
 // Save ...
-func (o *Setting) Save(u *Setting) error {
+func (Setting) Save(u *Setting) error {
 	if u.Key == "" {
 		return errors.New("key error")
 	}
@@ -60,7 +60,7 @@ func (o *Setting) Save(u *Setting) error {
 }
 
 // Delete ...
-func (o *Setting) Delete(key string) error {
+func (Setting) Delete(key string) error {
 	if key == "" {
 		return errors.New("key error")
 	}

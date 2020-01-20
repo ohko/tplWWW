@@ -23,7 +23,7 @@ var (
 
 type model struct{}
 
-func (o *model) Print(arg ...interface{}) {
+func (model) Print(arg ...interface{}) {
 	common.LL.LogCalldepth(2, logger.LoggerLevel0Debug, arg[3:]...)
 }
 

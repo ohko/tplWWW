@@ -36,7 +36,7 @@ func NewMember() *Member {
 }
 
 // Check ...
-func (o *Member) Check(user, pass string) error {
+func (Member) Check(user, pass string) error {
 	var u Member
 	if err := db.First(&u, &Member{
 		User: user,
@@ -48,7 +48,7 @@ func (o *Member) Check(user, pass string) error {
 }
 
 // Save ...
-func (o *Member) Save(m *Member) error {
+func (Member) Save(m *Member) error {
 	if m.User == "" {
 		return errors.New("user error")
 	}
