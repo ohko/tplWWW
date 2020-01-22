@@ -24,7 +24,7 @@ var (
 type model struct{}
 
 func (model) Print(arg ...interface{}) {
-	common.LL.LogCalldepth(2, logger.LoggerLevel0Debug, arg[3:]...)
+	common.LL.LogCalldepth(9, logger.LoggerLevel0Debug, arg[2:]...)
 }
 
 // Init 初始化数据库
