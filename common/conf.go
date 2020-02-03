@@ -10,7 +10,7 @@ import (
 
 // var
 var (
-	LL           = logger.NewLogger(logger.NewDefaultWriter(logger.DefaultWriterOption{Clone: os.Stdout, Path: "./log", Label: "tpler", Name: "log_"}))
+	LL           = logger.NewLogger(logger.NewDefaultWriter(&logger.DefaultWriterOption{Clone: os.Stdout, Path: "./log", Label: "tpler", Name: "log_"}))
 	TimeLocation *time.Location
 	SessionName  = "TPLER"
 )
