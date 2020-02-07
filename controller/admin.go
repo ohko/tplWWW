@@ -3,7 +3,9 @@ package controller
 import (
 	"net/http"
 	"strconv"
+	"strings"
 
+	"tpler/backend"
 	"tpler/common"
 	"tpler/model"
 
@@ -56,9 +58,16 @@ func (o *AdminController) Logout(ctx *hst.Context) {
 
 // Index ...
 func (o *AdminController) Index(ctx *hst.Context) {
+
+	var ss []string
+	for _, v := range backend.Backends {
+		ss = append(ss, v.Status())
+	}
+
 	m, _ := ctx.SessionGet("Member")
-	o.renderAdmin(ctx, &model.Member{
-		User: m.(string),
+	o.renderAdmin(ctx, map[string]interface{}{
+		"status": strings.Join(ss, "<br>"),
+		"u":      &model.Member{User: m.(string)},
 	}, "admin/index.html")
 }
 

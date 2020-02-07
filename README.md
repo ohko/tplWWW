@@ -11,6 +11,7 @@
 - root
  ∟ api        程序接口/第三方服务
  ∟ backend    后端自动化执行代码
+ ∟ component  组件
  ∟ controller 业务逻辑Golang代码
  ∟ db         sqlite3数据库
  ∟ dist       前端开发的零时输出文件

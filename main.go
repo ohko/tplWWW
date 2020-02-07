@@ -5,6 +5,7 @@ import (
 	"log"
 	"runtime"
 
+	"tpler/backend"
 	"tpler/common"
 	"tpler/controller"
 	"tpler/model"
@@ -39,6 +40,11 @@ func main() {
 			common.LL.Log4Trace(err)
 		}
 		return
+	}
+
+	// 初始化后台程序
+	if err := backend.Start(); err != nil {
+		common.LL.Log3Fatal(err)
 	}
 
 	// 启动web服务
