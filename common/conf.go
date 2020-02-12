@@ -10,9 +10,19 @@ import (
 
 // var
 var (
-	LL           = logger.NewLogger(logger.NewDefaultWriter(&logger.DefaultWriterOption{Clone: os.Stdout, Path: "./log", Label: "tpler", Name: "log_"}))
+	// 日志写到文件
+	LLFile = logger.NewDefaultWriter(&logger.DefaultWriterOption{
+		Clone: os.Stdout,
+		Path:  "./log",
+		Label: "tpler",
+		Name:  "log_",
+	})
+	// 日志接口
+	LL = logger.NewLogger(LLFile)
+	// 时间地区
 	TimeLocation *time.Location
-	SessionName  = "TPLER"
+	// Session名称
+	SessionName = "TPLER"
 )
 
 // Init 初始化系统配置

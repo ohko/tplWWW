@@ -46,3 +46,64 @@ parcel watch --public-url=/adm/ --out-dir=./dist/ vue/index.html
 ```
 parcel build --public-url=/public/admin/ --out-dir=./public/admin/ --no-source-maps --no-cache --no-minify vue/index.html
 ```
+
+## 后端日志流程跟踪
+```golang
+// 1. 定义日志写到文件
+LLFile = logger.NewDefaultWriter(&logger.DefaultWriterOption{
+   Clone: os.Stdout,
+   Path:  "./log",
+   Label: "tpler",
+   Name:  "log_",
+})
+
+// 2. 执行流程中创建新的logger对象，在函数间作为参数或上下文参数传递
+// 具体实例代码：/backend/demo2/demo2.go
+func (o *Demo2) do() {
+	for {
+		time.Sleep(time.Second * 5)
+
+      // 创建新的logger对象
+      loger := logger.NewLogger(common.LLFile)
+      // 用nano时间格式保证唯一性和了解启动时间点
+      loger.SetPrefix(time.Now().Format(time.RFC3339Nano))
+      // 传递logger
+		o.step1(loger)
+	}
+}
+
+// loger当作当前协程日志记录接口
+func (o *Demo2) step1(loger *logger.Logger) {
+   loger.Log0Debug("Demo2 :: step1")
+   // 传递logger
+	go o.step2(loger)
+}
+
+// loger当作当前协程日志记录接口
+func (o *Demo2) step2(loger *logger.Logger) {
+   loger.Log0Debug("Demo2 :: step2")
+   // 传递logger
+	go o.step3(loger)
+}
+
+// loger当作当前协程日志记录接口
+func (o *Demo2) step3(loger *logger.Logger) {
+	go loger.Log0Debug("Demo2 :: step3")
+}
+```
+
+## 日志效果
+```log
+2020/02/12 16:52:38 demo2.go:44: [2020-02-12T16:52:38.78484+08:00:D] Demo2 :: step1
+2020/02/12 16:52:38 demo2.go:44: [2020-02-12T16:52:38.784881+08:00:D] Demo2 :: step1
+2020/02/12 16:52:38 demo2.go:49: [2020-02-12T16:52:38.784881+08:00:D] Demo2 :: step2
+2020/02/12 16:52:38 demo2.go:55: [2020-02-12T16:52:38.784881+08:00:D] Demo2 :: step3
+2020/02/12 16:52:38 demo2.go:49: [2020-02-12T16:52:38.78484+08:00:D] Demo2 :: step2
+2020/02/12 16:52:38 demo2.go:55: [2020-02-12T16:52:38.78484+08:00:D] Demo2 :: step3
+2020/02/12 16:52:43 demo2.go:44: [2020-02-12T16:52:43.789002+08:00:D] Demo2 :: step1
+2020/02/12 16:52:43 demo2.go:44: [2020-02-12T16:52:43.789017+08:00:D] Demo2 :: step1 <- 789017:可讲上下日志串起来
+2020/02/12 16:52:43 demo2.go:49: [2020-02-12T16:52:43.789017+08:00:D] Demo2 :: step2 <- 789017:可讲上下日志串起来
+2020/02/12 16:52:43 demo2.go:49: [2020-02-12T16:52:43.789002+08:00:D] Demo2 :: step2
+2020/02/12 16:52:43 demo2.go:55: [2020-02-12T16:52:43.789002+08:00:D] Demo2 :: step3
+2020/02/12 16:52:43 demo2.go:55: [2020-02-12T16:52:43.789017+08:00:D] Demo2 :: step3 <- 789017:可讲上下日志串起来
+```
