@@ -53,7 +53,7 @@ func (o *SessionMemory) Set(c *Context, key string, value interface{}, expire ti
 			Expires:  time.Now().Add(o.cookieExpire),
 			HttpOnly: true,
 		}
-		c.R.Header.Set("Cookie", ck.String())
+		c.R.AddCookie(ck)
 		http.SetCookie(c.W, ck)
 	}
 
@@ -112,6 +112,8 @@ func (o *SessionMemory) Destory(c *Context) error {
 		delete(o.data, ck.Value)
 	}
 	ck.Expires = time.Now().Add(-1)
+	ck.Domain = o.cookieDomain
+	ck.Path = o.cookiePath
 	http.SetCookie(c.W, ck)
 	return nil
 }

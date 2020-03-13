@@ -25,7 +25,7 @@ func (o *Demo2) Register() error {
 
 // Status ...
 func (o *Demo2) Status() string {
-	return fmt.Sprintf("demo1: %s ~ %s", o.start, o.last)
+	return fmt.Sprintf("demo2: %s ~ %s", o.start, o.last)
 }
 
 func (o *Demo2) do() {
