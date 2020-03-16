@@ -74,5 +74,25 @@
     <div>JSON:{[{ .|json }]}</div>
     <div>User:{[{ .u.User }]}</div>
     <div>Backend status:<br>{[{ .status }]}</div>
+    <script>
+        // websocket例子
+        if (window["WebSocket"]) {
+            var ws = new WebSocket("ws://" + location.host + "/ws")
+            ws.onclose = function (evt) {
+                console.log("Connection Closed.")
+            }
+            ws.onmessage = function (evt) {
+                console.log(evt.data)
+            }
+            document.body.addEventListener("click", function (x) {
+                if (ws.readyState == 1) {
+                    ws.send(JSON.stringify({
+                        no: 0,
+                        data: { click: new Date().toISOString() }
+                    }))
+                }
+            })
+        } 
+    </script>
 </section>
 {[{ end }]}
