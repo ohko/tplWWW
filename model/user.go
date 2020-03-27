@@ -1,7 +1,6 @@
 package model
 
 import (
-	"bytes"
 	"errors"
 
 	"tpler/common"
@@ -9,7 +8,8 @@ import (
 
 // User 用户模型
 type User struct {
-	User  string `gorm:"PRIMARY_KEY"`
+	ID    int    `gorm:"PRIMARY_KEY;AUTO_INCREMENT"`
+	User  string `gorm:"UNIQUE"`
 	Pass  string `json:"-"`
 	Email string
 }
@@ -21,13 +21,13 @@ func NewUser() *User {
 
 // Check ...
 func (o User) Check(user, pass string) error {
-	u, err := o.Get(user)
-	if err != nil {
-		return err
+	if user == "" {
+		return errors.New("user not found")
 	}
 
-	if bytes.Compare([]byte(u.Pass), common.Hash([]byte(pass))) != 0 {
-		return errors.New("password error")
+	var u User
+	if err := db.Find(&u, &User{User: user, Pass: string(common.Hash([]byte(pass)))}).Error; err != nil {
+		return errors.New("user not found")
 	}
 
 	return nil
@@ -47,33 +47,27 @@ func (User) List(offset, limit int) (int, []*User, error) {
 	return count, us, nil
 }
 
-// ListPageDemo ...
-func (User) ListPageDemo(offset, limit int) (int, []*User, error) {
-	var count int
-	if err := db.Model(&User{}).Count(&count).Error; err != nil {
-		return 0, nil, err
-	}
-
-	var us []*User
-	if err := db.Order("user").Offset(offset).Limit(limit).Find(&us).Error; err != nil {
-		return 0, nil, err
-	}
-	return count, us, nil
-}
-
 // Get ...
-func (User) Get(user string) (*User, error) {
+func (User) Get(id int) (*User, error) {
 	var u User
 
-	if user == "" {
-		return nil, errors.New("user error")
+	if id == 0 {
+		return nil, errors.New("id error")
 	}
 
-	if err := db.Find(&u, &User{User: user}).Error; err != nil {
+	if err := db.Find(&u, &User{ID: id}).Error; err != nil {
 		return nil, err
 	}
 
 	return &u, nil
+}
+
+// Create ...
+func (User) Create(u *User) error {
+	if u.User == "" {
+		return errors.New("user error")
+	}
+	return db.Create(u).Error
 }
 
 // Save ...
@@ -86,9 +80,9 @@ func (User) Save(u *User) error {
 }
 
 // Delete ...
-func (User) Delete(user string) error {
-	if user == "" {
-		return errors.New("user error")
+func (User) Delete(ids []int) error {
+	if len(ids) == 0 {
+		return errors.New("ids error")
 	}
-	return db.Delete(&User{User: user}).Error
+	return db.Where("ID in (?)", ids).Delete(&User{}).Error
 }

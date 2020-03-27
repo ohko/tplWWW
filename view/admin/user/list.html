@@ -1,41 +1,90 @@
 {[{ define "body" }]}
 <section class="content-header">
-    <a href="/admin_user/add" class="btn btn-primary">添加</a>
     <div class="box">
         <div class="box-header">
             <h3 class="box-title">Users</h3>
+            <div class="box-tools">
+                <a href="/admin_user/add" class="btn btn-primary">添加</a>
+            </div>
         </div>
         <div class="box-body">
-            <table class="table table-hover" id="list"></table>
+            <div id="myGrid" class="ag-theme-balham" style="width: 100%;height:600px;"></div>
         </div>
     </div>
 </section>
 
 
 <script>
+    var grid = null
+
+    function refresh() {
+        grid.gridOptions.api.purgeServerSideCache()
+        grid.gridOptions.api.deselectAll()
+        grid.gridOptions.api.clearRangeSelection()
+    }
+
     $(function () {
-        $('#list').DataTable({
-            "processing": true,
-            "serverSide": true,
-            "ajax": location.href,
-            "columns": [
-                { title: "User", data: "User" },
-                { title: "Email", data: "Email" },
-                {
-                    render: function (data, type, row) {
-                        return `<a href="/admin_user/edit?User=${row.User}" class="btn btn-primary">编辑</a>
-                            <a href="/admin_user/delete?User=${row.User}" onclick="return confirm('确定删除吗？')" class="btn btn-danger">删除</a>`
-                    },
-                },
+        var gridOptions = {
+            columnDefs: [
+                { field: 'ID', checkboxSelection: true },
+                { field: 'User' },
+                { field: 'Email' },
             ],
-            'pageLength': 20,
-            'paging': true,
-            'lengthChange': false,
-            'searching': false,
-            'ordering': false,
-            'info': true,
-            'autoWidth': true
-        })
+
+            defaultColDef: {
+                flex: 1,
+                // sortable: true,
+                // filter: true,
+                resizable: true,
+            },
+            // floatingFilter: true,
+            rowModelType: 'serverSide',
+            animateRows: true,
+            cacheBlockSize: 100,
+            maxBlocksInCache: 10,
+            enableRangeSelection: true,
+            rowSelection: 'multiple',
+            allowContextMenuWithControlKey: true,
+            getContextMenuItems: params => {
+                return [
+                    'chartRange',
+                    'separator',
+                    {
+                        name: '删除',
+                        action: function () {
+                            const sels = grid.gridOptions.api.getSelectedRows()
+                            if (sels.length == 0) return
+                            let ids = []
+                            for (let i = 0; i < sels.length; i++) ids.push(sels[i].ID)
+                            if (!confirm("确定要删除吗？")) return
+                            $.getJSON("/admin_user/delete", { IDs: ids.join(",") }, x => {
+                                refresh()
+                            });
+                        },
+                    },
+                ]
+            },
+            statusBar: {
+                statusPanels: [
+                    // { statusPanel: 'agTotalAndFilteredRowCountComponent', align: 'left' },
+                    // { statusPanel: 'agTotalRowCountComponent', align: 'center' },
+                    // { statusPanel: 'agFilteredRowCountComponent' },
+                    { statusPanel: 'agSelectedRowCountComponent' },
+                    { statusPanel: 'agAggregationComponent' },
+                ],
+            },
+        };
+
+        window.aa = grid = new agGrid.Grid(document.querySelector('#myGrid'), gridOptions);
+        gridOptions.api.setServerSideDatasource({
+            getRows: params => {
+                $.getJSON("/admin_user/list", JSON.parse(JSON.stringify(params.request)), x => {
+                    const lastRow = x.data.total <= params.request.endRow ? x.data.total : -1;
+                    params.successCallback(x.data.rows, lastRow);
+                }, x => { params.failCallback() });
+            },
+        });
+        grid.gridOptions.onRowDoubleClicked = x => location.href = `/admin_user/edit?ID=${x.data.ID}`
     })
 </script>
 {[{ end }]}

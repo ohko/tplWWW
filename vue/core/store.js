@@ -1,5 +1,7 @@
 // 状态管理
 
+import Vuex from "vuex"
+
 module.exports = new Vuex.Store({
    state: {
       clickCount: parseInt(localStorage.getItem("clickCount")) || 0

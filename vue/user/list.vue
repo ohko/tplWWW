@@ -1,32 +1,15 @@
 <template>
     <DefaultLayout>
         <section class="content-header">
-            <router-link to="/admin/user/add" class="btn btn-primary">添加</router-link>
             <div class="box">
                 <div class="box-header">
                     <h3 class="box-title">Users</h3>
+                    <div class="box-tools">
+                        <router-link to="/admin/user/add" class="btn btn-sm btn-primary">添加</router-link>
+                    </div>
                 </div>
                 <div class="box-body">
-                    <table class="table table-hover" id="list">
-                        <thead>
-                            <tr>
-                                <th>User</th>
-                                <th>Email</th>
-                                <th>-</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="user in list">
-                                <td>{{user.User}}</td>
-                                <td>{{user.Email}}</td>
-                                <td>
-                                    <router-link :to="'/admin/user/edit/'+user.User" class="btn btn-primary">编辑
-                                    </router-link>
-                                    <div @click="del(user.User)" class="btn btn-danger">删除</div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div id="myGrid" class="ag-theme-balham" style="width: 100%;height:600px;"></div>
                 </div>
             </div>
         </section>
@@ -42,41 +25,83 @@
         },
         data() {
             return {
-                list: []
+                agGrid: null,
             }
         },
         props: {},
         created() { },
         mounted() {
-            this.refresh()
+            var gridOptions = {
+                columnDefs: [
+                    { field: 'ID', checkboxSelection: true },
+                    { field: 'User' },
+                    { field: 'Email' },
+                ],
+
+                defaultColDef: {
+                    flex: 1,
+                    // sortable: true,
+                    // filter: true,
+                    resizable: true,
+                },
+                // floatingFilter: true,
+                rowModelType: 'serverSide',
+                animateRows: true,
+                cacheBlockSize: 100,
+                maxBlocksInCache: 10,
+                enableRangeSelection: true,
+                rowSelection: 'multiple',
+                allowContextMenuWithControlKey: true,
+                getContextMenuItems: params => {
+                    return [
+                        'chartRange',
+                        'separator',
+                        {
+                            name: '删除',
+                            action: this.del,
+                        },
+                    ]
+                },
+                statusBar: {
+                    statusPanels: [
+                        // { statusPanel: 'agTotalAndFilteredRowCountComponent', align: 'left' },
+                        // { statusPanel: 'agTotalRowCountComponent', align: 'center' },
+                        // { statusPanel: 'agFilteredRowCountComponent' },
+                        { statusPanel: 'agSelectedRowCountComponent' },
+                        { statusPanel: 'agAggregationComponent' },
+                    ],
+                },
+            };
+
+            window.aa = this.agGrid = new agGrid.Grid(document.querySelector('#myGrid'), gridOptions);
+            gridOptions.api.setServerSideDatasource({
+                getRows: params => {
+                    this.$getJSON("/admin_user/list", JSON.parse(JSON.stringify(params.request)), x => {
+                        const lastRow = x.data.total <= params.request.endRow ? x.data.total : -1;
+                        params.successCallback(x.data.rows, lastRow);
+                    }, x => { params.failCallback() });
+                },
+            });
+            this.agGrid.gridOptions.onRowDoubleClicked = x => this.$router.push(`/admin/user/edit/${x.data.ID}`)
         },
-        destroyed() { },
+        destroyed() {
+            this.agGrid.destroy();
+        },
         methods: {
             refresh() {
-                this.$getJSON("/admin_user/list", null, x => {
-                    if (x.no != 0) return alert(x.msg)
-                    this.list = x.data
-
-                    setTimeout(_ => {
-                        window.xx = $('#list').DataTable({
-                            'paging': true,
-                            'lengthChange': true,
-                            'searching': true,
-                            'ordering': true,
-                            'info': true,
-                            'autoWidth': true
-                        })
-                    })
-                })
+                this.agGrid.gridOptions.api.purgeServerSideCache()
+                this.agGrid.gridOptions.api.deselectAll()
+                this.agGrid.gridOptions.api.clearRangeSelection()
             },
-            del(user) {
-                if (!confirm('确定删除吗？')) return;
-
-                this.$getJSON('/admin_user/delete', { User: user }, x => {
-                    if (x.no != 0) return alert(x.msg)
-                    $("#list").DataTable().destroy()
+            del() {
+                const sels = this.agGrid.gridOptions.api.getSelectedRows()
+                if (sels.length == 0) return
+                let ids = []
+                for (let i = 0; i < sels.length; i++) ids.push(sels[i].ID)
+                if (!confirm("确定要删除吗？")) return
+                this.$getJSON("/admin_user/delete", { IDs: ids.join(",") }, x => {
                     this.refresh()
-                })
+                });
             }
         },
         filters: {},

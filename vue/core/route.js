@@ -31,7 +31,7 @@ module.exports = [
    { path: '/admin/error', component: Error },
    { path: '/admin/user/list', component: AdminUserList },
    { path: '/admin/user/add', component: AdminUserAdd },
-   { path: '/admin/user/edit/:user', component: AdminUserEdit },
+   { path: '/admin/user/edit/:id', component: AdminUserEdit },
    { path: '/admin/setting/list', component: AdminSettingList },
    { path: '/admin/setting/add', component: AdminSettingAdd },
    { path: '/admin/setting/edit/:key', component: AdminSettingEdit },

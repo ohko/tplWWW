@@ -1,10 +1,13 @@
 <template>
     <DefaultLayout>
         <section class="content-header">
-            <router-link to="/admin/setting/add" class="btn btn-primary">添加</router-link>
+
             <div class="box">
                 <div class="box-header">
                     <h3 class="box-title">Setting</h3>
+                    <div class="box-tools">
+                        <router-link to="/admin/setting/add" class="btn btn-sm btn-primary">添加</router-link>
+                    </div>
                 </div>
                 <div class="box-body">
                     <table class="table table-hover" id="list">
@@ -46,11 +49,7 @@
         components: {
             DefaultLayout
         },
-        data() {
-            return {
-                list: []
-            }
-        },
+        data() { return { list: [] } },
         props: {},
         created() { },
         mounted() {
@@ -62,17 +61,6 @@
                 this.$getJSON("/admin_setting/list", null, x => {
                     if (x.no != 0) return alert(x.msg)
                     this.list = x.data
-
-                    setTimeout(_ => {
-                        window.xx = $('#list').DataTable({
-                            'paging': true,
-                            'lengthChange': true,
-                            'searching': true,
-                            'ordering': true,
-                            'info': true,
-                            'autoWidth': true
-                        })
-                    })
                 })
             },
             del(key) {

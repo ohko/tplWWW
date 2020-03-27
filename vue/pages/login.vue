@@ -82,7 +82,7 @@
       },
       doLogin(o) {
         this.$post("/admin/login", this.form, x => {
-          if (x.no != 0) return alert(x.data);
+          if (x.no != 0) return toastr.error(x.data);
           $(".login-box-msg").html("登陆成功");
           this.$router.push('/admin/dashboard');
         });

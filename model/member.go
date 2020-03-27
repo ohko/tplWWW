@@ -9,7 +9,8 @@ import (
 
 // Member 管理员模型
 type Member struct {
-	User string `gorm:"PRIMARY_KEY"`
+	ID   int    `gorm:"PRIMARY_KEY;AUTO_INCREMENT"`
+	User string `gorm:"UNIQUE"`
 	Pass string `json:"-"`
 }
 
@@ -45,6 +46,14 @@ func (Member) Check(user, pass string) error {
 		return err
 	}
 	return nil
+}
+
+// Create ...
+func (Member) Create(u *Member) error {
+	if u.User == "" {
+		return errors.New("user error")
+	}
+	return db.Create(u).Error
 }
 
 // Save ...

@@ -31,7 +31,7 @@ func (model) Print(arg ...interface{}) {
 func Init(dbPath string) error {
 	var err error
 
-	os.MkdirAll(filepath.Dir(dbPath), 0755)
+	_ = os.MkdirAll(filepath.Dir(dbPath), 0755)
 	if db, err = gorm.Open("sqlite3", dbPath); err != nil {
 		// if db, err = gorm.Open("postgres", "postgres://user:pass@host/database?sslmode=disable"); err != nil {
 		return err

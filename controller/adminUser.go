@@ -3,6 +3,7 @@ package controller
 import (
 	"net/http"
 	"strconv"
+	"strings"
 
 	"tpler/common"
 	"tpler/model"
@@ -18,19 +19,17 @@ type AdminUserController struct {
 // List 用户列表
 func (o *AdminUserController) List(ctx *hst.Context) {
 	if ctx.IsAjax() {
-		draw, _ := strconv.Atoi(ctx.R.FormValue("draw"))
-		start, _ := strconv.Atoi(ctx.R.FormValue("start"))
-		length, _ := strconv.Atoi(ctx.R.FormValue("length"))
-		count, us, err := model.DBUser.List(start, length)
+		startRow, _ := strconv.Atoi(ctx.R.FormValue("startRow"))
+		endRow, _ := strconv.Atoi(ctx.R.FormValue("endRow"))
+		total, us, err := model.DBUser.List(startRow, endRow-startRow)
 		if err != nil {
 			o.renderAdminError(ctx, err.Error())
 		}
 
-		ctx.JSON(200, map[string]interface{}{
-			"draw":            draw,
-			"recordsTotal":    count,
-			"recordsFiltered": count,
-			"data":            us,
+		ctx.JSON2(200, 0, map[string]interface{}{
+			"success": true,
+			"total":   total,
+			"rows":    us,
 		})
 	}
 
@@ -59,8 +58,8 @@ func (o *AdminUserController) Add(ctx *hst.Context) {
 
 // Detail 查看用户
 func (o *AdminUserController) Detail(ctx *hst.Context) {
-	user := ctx.R.FormValue("User")
-	u, err := model.DBUser.Get(user)
+	id, _ := strconv.Atoi(ctx.R.FormValue("ID"))
+	u, err := model.DBUser.Get(id)
 	if err != nil {
 		o.renderAdminError(ctx, err.Error())
 	}
@@ -73,8 +72,8 @@ func (o *AdminUserController) Detail(ctx *hst.Context) {
 
 // Edit 编辑用户
 func (o *AdminUserController) Edit(ctx *hst.Context) {
-	user := ctx.R.FormValue("User")
-	u, err := model.DBUser.Get(user)
+	id, _ := strconv.Atoi(ctx.R.FormValue("ID"))
+	u, err := model.DBUser.Get(id)
 	if err != nil {
 		o.renderAdminError(ctx, err.Error())
 	}
@@ -102,8 +101,16 @@ func (o *AdminUserController) Edit(ctx *hst.Context) {
 
 // Delete 删除用户
 func (o *AdminUserController) Delete(ctx *hst.Context) {
-	user := ctx.R.FormValue("User")
-	if err := model.DBUser.Delete(user); err != nil {
+	_ids := strings.Split(ctx.R.FormValue("IDs"), ",")
+	ids := []int{}
+	for _, v := range _ids {
+		tmp, _ := strconv.Atoi(v)
+		if tmp == 0 {
+			continue
+		}
+		ids = append(ids, tmp)
+	}
+	if err := model.DBUser.Delete(ids); err != nil {
 		o.renderAdminError(ctx, err.Error())
 	}
 

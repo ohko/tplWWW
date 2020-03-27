@@ -121,19 +121,17 @@ func (o *AdminController) Form(ctx *hst.Context) {
 // Table ...
 func (o *AdminController) Table(ctx *hst.Context) {
 	if ctx.IsAjax() {
-		draw, _ := strconv.Atoi(ctx.R.FormValue("draw"))
-		start, _ := strconv.Atoi(ctx.R.FormValue("start"))
-		length, _ := strconv.Atoi(ctx.R.FormValue("length"))
-		count, us, err := model.DBUser.ListPageDemo(start, length)
+		startRow, _ := strconv.Atoi(ctx.R.FormValue("startRow"))
+		endRow, _ := strconv.Atoi(ctx.R.FormValue("endRow"))
+		total, us, err := model.DBUser.List(startRow, endRow-startRow)
 		if err != nil {
 			o.renderAdminError(ctx, err.Error())
 		}
 
-		ctx.JSON(200, map[string]interface{}{
-			"draw":            draw,
-			"recordsTotal":    count,
-			"recordsFiltered": count,
-			"data":            us,
+		ctx.JSON2(200, 0, map[string]interface{}{
+			"success": true,
+			"total":   total,
+			"rows":    us,
 		})
 	}
 

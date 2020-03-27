@@ -51,6 +51,7 @@
         data() {
             return {
                 form: {
+                    ID: 0,
                     User: "",
                     Pass: "",
                     Email: "",
@@ -60,8 +61,8 @@
         props: {},
         created() { },
         mounted() {
-            this.$getJSON('/admin_user/detail', { User: this.$route.params.user }, x => {
-                if (x.no != 0) return alert(x.msg)
+            this.$getJSON('/admin_user/detail', { ID: this.$route.params.id }, x => {
+                if (x.no != 0) return toastr.error(x.msg)
                 this.form = x.data
             })
         },
@@ -69,7 +70,7 @@
         methods: {
             submit() {
                 this.$post('/admin_user/edit', this.form, x => {
-                    if (x.no != 0) return alert(x.msg)
+                    if (x.no != 0) return toastr.error(x.msg)
                     this.$router.push('/admin/user/list')
                 })
             }

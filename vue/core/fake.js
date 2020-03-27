@@ -17,17 +17,23 @@ const menu = {
 }
 
 const userList = {
-   "no": 0, "data": [
-      { "User": "user-1", "Email": "email1@qq.com" },
-      { "User": "user-2", "Email": "email2@qq.com" },
-   ]
+   "no": 0, "data": {
+      success: true, total: 2,
+      rows: [
+         { "User": "user-1", "Email": "email1@qq.com" },
+         { "User": "user-2", "Email": "email2@qq.com" },
+      ]
+   }
 }
 
 const settingList = {
-   "no": 0, "data": [
-      { "Key": "key-1", "Int": 1, "String": "a", "Bool": true },
-      { "Key": "key-2", "Int": 2, "String": "b", "Bool": false },
-   ]
+   "no": 0, "data": {
+      success: true, total: 2,
+      rows: [
+         { "Key": "key-1", "Int": 1, "String": "a", "Bool": true },
+         { "Key": "key-2", "Int": 2, "String": "b", "Bool": false },
+      ]
+   }
 }
 
 const userDetail = {
