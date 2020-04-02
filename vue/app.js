@@ -28,8 +28,12 @@ import VueRouter from "vue-router"; Vue.use(VueRouter)
 import request from "./core/request.js";
 
 // 依次加载资源文件
+const allAssetsCount = assets.length
+let loadedAssetsCount = 0
+const loading = document.querySelector("#loading")
 const loadAssets = () => {
    if (assets.length == 0) {
+      document.body.removeChild(loading)
       Vue.use(request)
 
       // 资源文件加载结束后再初始化Vue
@@ -47,6 +51,7 @@ const loadAssets = () => {
    const url = assets.splice(0, 1)[0]
    const exts = url.split(".")
    const ext = exts[exts.length - 1]
+   loading.innerHTML = "Loading ... (" + (++loadedAssetsCount) + "/" + allAssetsCount + "): " + url
    if (ext == "css") {
       const css = document.createElement("link")
       css.href = url; css.rel = "stylesheet"; css.onload = loadAssets
