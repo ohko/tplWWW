@@ -154,7 +154,7 @@ func Init(dbPath string) error {
 	sqlLog := common.LL.Fork("SQL")
 	sqlLog.SetFlags(0)
 	db.SetLogger(&model{ll: sqlLog})
-	db.LogMode(os.Getenv("DEBUG") != "")
+	db.LogMode(true)
 	db.SingularTable(true)
 	db.DB().SetMaxOpenConns(2)
 	db.SetNowFuncOverride(func() time.Time {
