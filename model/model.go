@@ -31,7 +31,11 @@ type model struct {
 }
 
 func (o model) Print(arg ...interface{}) {
-	o.ll.Log0Debug(LogFormatter(arg...)...)
+	if strings.HasPrefix(arg[3].(string), "UPDATE ") || strings.HasPrefix(arg[3].(string), "INSERT ") {
+		o.ll.Log4Trace(LogFormatter(arg...)...)
+	} else {
+		o.ll.Log0Debug(LogFormatter(arg...)...)
+	}
 }
 
 var LogFormatter = func(values ...interface{}) (messages []interface{}) {
