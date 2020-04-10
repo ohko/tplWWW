@@ -151,7 +151,7 @@ func Init(dbPath string) error {
 		// if db, err = gorm.Open("postgres", "postgres://user:pass@host/database?sslmode=disable"); err != nil {
 		return err
 	}
-	sqlLog := common.LL.Fork("SQL")
+	sqlLog := logger.NewLogger(common.LLFile)
 	sqlLog.SetFlags(0)
 	db.SetLogger(&model{ll: sqlLog})
 	db.LogMode(true)
