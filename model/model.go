@@ -32,6 +32,9 @@ type model struct {
 }
 
 func (o model) Print(arg ...interface{}) {
+	if arg[0].(string) != "sql" {
+		return
+	}
 	if strings.HasPrefix(arg[3].(string), "UPDATE ") || strings.HasPrefix(arg[3].(string), "INSERT ") {
 		o.ll.Log4Trace(LogFormatter(arg...)...)
 	} else {
