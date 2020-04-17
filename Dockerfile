@@ -7,6 +7,7 @@ FROM golang:1.13-buster AS builder
 ENV GO111MODULE on
 ENV CGO_ENABLED 1
 ENV GOFLAGS -mod=vendor
+ENV TZ Asia/Shanghai
 COPY . /go/src
 WORKDIR /go/src
 RUN go build -v -o tpler_linux64 -ldflags "-s -w -X main.buildInfo='`git tag --contains master`.`git rev-parse --short HEAD`@`date '+%Y-%m-%d_%H:%M:%S_%Z_%z'`'" .
