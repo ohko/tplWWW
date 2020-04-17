@@ -26,6 +26,7 @@ func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	log.SetFlags(log.Flags() | log.Lshortfile)
 	println("BuildInfo:", buildInfo)
+	common.BuildInfo = buildInfo
 
 	// 系统初始化
 	if err := common.Init(); err != nil {

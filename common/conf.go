@@ -10,6 +10,7 @@ import (
 
 // var
 var (
+	BuildInfo = ""
 	// 日志写到文件
 	LLFile = logger.NewDefaultWriter(&logger.DefaultWriterOption{
 		Clone: os.Stdout,

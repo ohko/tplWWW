@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"tpler/common"
+
 	"github.com/ohko/hst"
 )
 
@@ -17,6 +19,11 @@ func (o *IndexController) render(ctx *hst.Context, data interface{}, names ...st
 // Index 默认主页
 func (o *IndexController) Index(ctx *hst.Context) {
 	o.render(ctx, nil, "page/index.html")
+}
+
+// BuildInfo 编译信息
+func (o *IndexController) BuildInfo(ctx *hst.Context) {
+	ctx.W.Write([]byte(common.BuildInfo))
 }
 
 // Ws websocket例子
