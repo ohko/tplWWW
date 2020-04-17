@@ -12,17 +12,20 @@ import (
 )
 
 var (
+	buildInfo    = ""
 	addr         = flag.String("s", ":8080", "server address")
 	sessionPath  = flag.String("sp", "/tmp/hst_session", "session path")
 	dbPath       = flag.String("db", "./db/sqlite3.db", "database path")
 	resetAdmin   = flag.String("resetAdmin", "", "reset admin new password")
 	oauth2Server = flag.String("o2", "http://127.0.0.1:8000", "oauth2 server")
+	version      = flag.Bool("v", false, buildInfo)
 )
 
 func main() {
 	flag.Parse()
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	log.SetFlags(log.Flags() | log.Lshortfile)
+	println("BuildInfo:", buildInfo)
 
 	// 系统初始化
 	if err := common.Init(); err != nil {
