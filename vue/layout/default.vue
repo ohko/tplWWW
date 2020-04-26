@@ -66,7 +66,7 @@
       beforeCreate() {
          setTimeout(_ => {
             $('.main-sidebar').tree()
-            // $(".content-wrapper").height(window.innerHeight - 51)
+            $(".content-wrapper").css("min-height", window.innerHeight - 51)
             $(".sidebar a").each(function (i, a) {
                if (a.href.split("?")[0] == location.href.split("?")[0]) {
                   $(a).parents("li").addClass("active menu-open");
