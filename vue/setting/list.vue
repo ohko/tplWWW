@@ -1,41 +1,45 @@
 <template>
     <DefaultLayout>
         <section class="content-header">
-
-            <div class="box">
-                <div class="box-header">
-                    <h3 class="box-title">Setting</h3>
-                    <div class="box-tools">
-                        <router-link to="/admin/setting/add" class="btn btn-sm btn-primary">添加</router-link>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="box">
+                        <div class="box-header">
+                            <h3 class="box-title">Setting</h3>
+                            <div class="box-tools">
+                                <router-link to="/admin/setting/add" class="btn btn-sm btn-primary">添加</router-link>
+                            </div>
+                        </div>
+                        <div class="box-body">
+                            <table class="table table-hover" id="list">
+                                <thead>
+                                    <tr>
+                                        <th>Key</th>
+                                        <th>Desc</th>
+                                        <th>Int</th>
+                                        <th>String</th>
+                                        <th>Bool</th>
+                                        <th>-</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="setting in list">
+                                        <td>{{setting.Key}}</td>
+                                        <td>{{setting.Desc}}</td>
+                                        <td>{{setting.Int}}</td>
+                                        <td>{{setting.String}}</td>
+                                        <td>{{setting.Bool}}</td>
+                                        <td>
+                                            <router-link :to="'/admin/setting/edit/'+setting.Key"
+                                                class="btn btn-primary">编辑
+                                            </router-link>
+                                            <div @click="del(setting.Key)" class="btn btn-danger">删除</div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                </div>
-                <div class="box-body">
-                    <table class="table table-hover" id="list">
-                        <thead>
-                            <tr>
-                                <th>Key</th>
-                                <th>Desc</th>
-                                <th>Int</th>
-                                <th>String</th>
-                                <th>Bool</th>
-                                <th>-</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="setting in list">
-                                <td>{{setting.Key}}</td>
-                                <td>{{setting.Desc}}</td>
-                                <td>{{setting.Int}}</td>
-                                <td>{{setting.String}}</td>
-                                <td>{{setting.Bool}}</td>
-                                <td>
-                                    <router-link :to="'/admin/setting/edit/'+setting.Key" class="btn btn-primary">编辑
-                                    </router-link>
-                                    <div @click="del(setting.Key)" class="btn btn-danger">删除</div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
                 </div>
             </div>
         </section>

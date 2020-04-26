@@ -1,15 +1,19 @@
 <template>
     <DefaultLayout>
         <section class="content-header">
-            <div class="box">
-                <div class="box-header">
-                    <h3 class="box-title">Users</h3>
-                    <div class="box-tools">
-                        <router-link to="/admin/user/add" class="btn btn-sm btn-primary">添加</router-link>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="box">
+                        <div class="box-header">
+                            <h3 class="box-title">Users</h3>
+                            <div class="box-tools">
+                                <router-link to="/admin/user/add" class="btn btn-sm btn-primary">添加</router-link>
+                            </div>
+                        </div>
+                        <div class="box-body">
+                            <div id="myGrid" class="ag-theme-balham" style="width: 100%;height:600px;"></div>
+                        </div>
                     </div>
-                </div>
-                <div class="box-body">
-                    <div id="myGrid" class="ag-theme-balham" style="width: 100%;height:600px;"></div>
                 </div>
             </div>
         </section>
