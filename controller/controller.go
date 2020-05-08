@@ -78,6 +78,7 @@ func Start(addr, sessionPath, oauth2Server string) {
 	)
 	s.RegisterHandle(nil,
 		&IndexController{},
+		&statusController{},
 	)
 
 	// 设置模版函数
