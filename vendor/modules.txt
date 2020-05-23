@@ -8,7 +8,7 @@ github.com/jinzhu/gorm/dialects/sqlite
 github.com/jinzhu/inflection
 # github.com/mattn/go-sqlite3 v2.0.1+incompatible
 github.com/mattn/go-sqlite3
-# github.com/ohko/hst v0.0.0-20200316095158-4fe2a48bcd61
+# github.com/ohko/hst v0.0.0-20200523082606-918429595ceb
 ## explicit
 github.com/ohko/hst
 # github.com/ohko/logger v0.2.10
