@@ -37,8 +37,11 @@ DEBUG=1 go run .
 
 ## 前端vue开发
 ```
+# 预处理静态文件
+npm run postbuild
+# 启动127.0.0.1:1234测试
 parcel vue/index.html
-# 或
+# 或 配合后端服务动态监听文件变化
 parcel watch --public-url=/adm/ --out-dir=./dist/ vue/index.html
 ```
 

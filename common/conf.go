@@ -13,10 +13,13 @@ var (
 	BuildInfo = ""
 	// 日志写到文件
 	LLFile = logger.NewDefaultWriter(&logger.DefaultWriterOption{
-		Clone: os.Stdout,
-		Path:  "./log",
-		Label: "tpler",
-		Name:  "log_",
+		CompressMode:  "day",     // 日志压缩模式 [month|day] month=按月压缩，day=按日压缩
+		CompressCount: 3,         // 仅在按日压缩模式下有效，设置为压缩几天前的日志，支持大于等于1的数字
+		CompressKeep:  30,        // 前多少次的压缩文件删除掉，支持month和day模式。默认为0，不删除。例如：1=保留最近1个压缩日志，2=保留最近2个压缩日志，依次类推。。。
+		Clone:         os.Stdout, // 日志克隆输出接口
+		Path:          "./log",   // 日志目录，默认目录：./log
+		Label:         "tpler",   // 日志标签
+		Name:          "log_",    // 日志文件名
 	})
 	// 日志接口
 	LL = logger.NewLogger(LLFile)

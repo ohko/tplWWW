@@ -11,5 +11,8 @@
   },
   "alias": {
     "vue": "./node_modules/vue/dist/vue.common.js"
+  },
+  "scripts": {
+    "postbuild": "mkdir -p dist/public; cp -r public/* dist/public/"
   }
 }
