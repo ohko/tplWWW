@@ -50,6 +50,9 @@ parcel watch --public-url=/adm/ --out-dir=./dist/ vue/index.html
 parcel build --public-url=/public/admin/ --out-dir=./public/admin/ --no-source-maps --no-cache --no-minify vue/index.html
 ```
 
+## 前后端开发跨域问题
+- Chrome: 修改 `chrome://flags/#same-site-by-default-cookies` 为 `Disabled`
+
 ## 后端日志流程跟踪
 ```golang
 // 1. 定义日志写到文件
