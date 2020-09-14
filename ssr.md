@@ -1,0 +1,3 @@
+- node ssr/index.js
+- parcel watch ssr/entry-server.js ssr/entry-client.js
+- http://127.0.0.1:8080

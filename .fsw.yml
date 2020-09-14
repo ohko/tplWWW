@@ -5,9 +5,13 @@ triggers:
   - '**/*.go'
   - '**/*.c'
   - '**/*.py'
+  - '**/*.js'
+  - '**/*.html'
+  - '**/*.ts'
   env:
     DEBUG: "1"
-  cmd: go run .
+  # cmd: go run .
+  cmd: node ssr/index.js
   shell: true
   delay: 100ms
   stop_timeout: 500ms
