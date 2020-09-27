@@ -43,6 +43,9 @@ steps:
       from_secret: docker_username
     password:
       from_secret: docker_password
+  when:
+    branch:
+    - master
 
 - name: docker-develop
   image: plugins/docker
@@ -58,6 +61,9 @@ steps:
       from_secret: docker_username
     password:
       from_secret: docker_password
+  when:
+    branch:
+    - develop
 
 - name: ssh-master
   image: appleboy/drone-ssh
