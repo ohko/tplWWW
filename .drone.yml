@@ -60,4 +60,4 @@ volumes:
 
 trigger:
   branch:
-  - master
+  - tpler
