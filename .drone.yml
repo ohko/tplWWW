@@ -1,0 +1,63 @@
+kind: pipeline
+name: default
+
+steps:
+
+- name: master
+  image: alpine/git
+  commands:
+  - git checkout origin/master -B master
+
+- name: parcel
+  image: ohko/parceljs
+  commands:
+  - npm install
+  - parcel build --public-url=/adm/ --out-dir=./dist/ --no-source-maps --no-cache --no-minify vue/index.html
+  - rm -rf node_modules
+
+- name: docker
+  image: plugins/docker
+  volumes:
+  - name: docker
+    path: /var/run/docker.sock
+  settings:
+    repo: registry.cn-chengdu.aliyuncs.com/zx-tech/tpler
+    registry: registry.cn-chengdu.aliyuncs.com
+    dockerfile: Dockerfile
+    username:
+      from_secret: docker_username
+    password:
+      from_secret: docker_password
+
+- name: ssh
+  image: appleboy/drone-ssh
+  settings:
+    host:
+      - erp-ip.zx-tech.net
+    username: root
+    ssh_key:
+      from_secret: ssh_key
+    script:
+      - /data/tpler/run.sh
+
+# - name: notify
+#   image: drillster/drone-email
+#   settings:
+#     host: smtp.exmail.qq.com
+#     port: 465
+#     username: nuc@lyl.hk
+#     password:
+#       from_secret: email_password
+#     from: nuc@lyl.hk
+#     recipients: [ xxx@qq.com ]
+#   when:
+#     status: [ success, failure ]
+
+volumes:
+- name: docker
+  host:
+    path: /var/run/docker.sock
+
+trigger:
+  branch:
+  - master
