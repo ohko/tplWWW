@@ -6,7 +6,7 @@ steps:
 - name: master
   image: alpine/git
   commands:
-  - git checkout origin/master -B master
+  - git checkout origin/tpler -B master
 
 - name: parcel
   image: ohko/parceljs
