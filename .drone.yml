@@ -5,23 +5,38 @@ steps:
 
 - name: master
   image: alpine/git
+  pull: false
   commands:
-  - git checkout origin/tpler -B master
+  - git checkout origin/master -B master
+  when:
+    branch:
+    - master
+
+- name: develop
+  image: alpine/git
+  pull: false
+  commands:
+  - git checkout origin/develop -B develop
+  when:
+    branch:
+    - develop
 
 - name: parcel
   image: ohko/parceljs
+  pull: false
   commands:
   - npm install
   - parcel build --public-url=/adm/ --out-dir=./dist/ --no-source-maps --no-cache --no-minify vue/index.html
   - rm -rf node_modules
 
-- name: docker
+- name: docker-master
   image: plugins/docker
+  pull: false
   volumes:
   - name: docker
     path: /var/run/docker.sock
   settings:
-    repo: registry.cn-chengdu.aliyuncs.com/zx-tech/tpler
+    repo: registry.cn-chengdu.aliyuncs.com/zx-tech/tpler-master
     registry: registry.cn-chengdu.aliyuncs.com
     dockerfile: Dockerfile
     username:
@@ -29,8 +44,24 @@ steps:
     password:
       from_secret: docker_password
 
-- name: ssh
+- name: docker-develop
+  image: plugins/docker
+  pull: false
+  volumes:
+  - name: docker
+    path: /var/run/docker.sock
+  settings:
+    repo: registry.cn-chengdu.aliyuncs.com/zx-tech/tpler-develop
+    registry: registry.cn-chengdu.aliyuncs.com
+    dockerfile: Dockerfile
+    username:
+      from_secret: docker_username
+    password:
+      from_secret: docker_password
+
+- name: ssh-master
   image: appleboy/drone-ssh
+  pull: false
   settings:
     host:
       - erp-ip.zx-tech.net
@@ -38,10 +69,29 @@ steps:
     ssh_key:
       from_secret: ssh_key
     script:
-      - /data/tpler/run.sh
+      - /data/tpler/run-master.sh
+  when:
+    branch:
+    - master
+
+- name: ssh-develop
+  image: appleboy/drone-ssh
+  pull: false
+  settings:
+    host:
+      - erp-ip.zx-tech.net
+    username: root
+    ssh_key:
+      from_secret: ssh_key
+    script:
+      - /data/tpler/run-develop.sh
+  when:
+    branch:
+    - develop
 
 # - name: notify
 #   image: drillster/drone-email
+#   pull: false
 #   settings:
 #     host: smtp.exmail.qq.com
 #     port: 465
@@ -60,4 +110,5 @@ volumes:
 
 trigger:
   branch:
-  - tpler
+  - master
+  - develop
