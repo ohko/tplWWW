@@ -85,7 +85,10 @@ func Open(dialect string, args ...interface{}) (db *DB, err error) {
 	db = &DB{
 		db:        dbSQL,
 		logger:    defaultLogger,
-		callbacks: DefaultCallback,
+		
+		// Create a clone of the default logger to avoid mutating a shared object when
+		// multiple gorm connections are created simultaneously.
+		callbacks: DefaultCallback.clone(defaultLogger),
 		dialect:   newDialect(dialect, dbSQL),
 	}
 	db.parent = db
@@ -531,6 +534,11 @@ func (s *DB) Debug() *DB {
 // Transaction start a transaction as a block,
 // return error will rollback, otherwise to commit.
 func (s *DB) Transaction(fc func(tx *DB) error) (err error) {
+
+	if _, ok := s.db.(*sql.Tx); ok {
+		return fc(s)
+	}
+
 	panicked := true
 	tx := s.Begin()
 	defer func() {
