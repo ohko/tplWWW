@@ -11,31 +11,31 @@ type Menu struct {
 // GetAdminMenu ...
 func (Menu) GetAdminMenu(who string) []Menu {
 	return []Menu{
-		Menu{Class: "fa-home", Text: "仪表盘", Href: "/admin/"},
-		Menu{Class: "fa-home", Text: "用户管理", Href: "/admin_user/list"},
-		Menu{Class: "fa-dashboard", Text: "示例",
+		{Class: "fa-home", Text: "仪表盘", Href: "/admin/"},
+		{Class: "fa-home", Text: "用户管理", Href: "/admin_user/list"},
+		{Class: "fa-dashboard", Text: "示例",
 			Child: []Menu{
-				Menu{Class: "fa-circle-o", Text: "表单", Href: "/admin/form"},
-				Menu{Class: "fa-circle-o", Text: "表格", Href: "/admin/table"},
+				{Class: "fa-circle-o", Text: "表单", Href: "/admin/form"},
+				{Class: "fa-circle-o", Text: "表格", Href: "/admin/table"},
 			}},
-		Menu{Class: "fa-home", Text: "系统配置", Href: "/admin_setting/list"},
-		Menu{Class: "fa-home", Text: "修改密码", Href: "/admin/password"},
-		Menu{Class: "fa-share", Text: "退出:" + who, Href: "javascript:vueMenu.logout()"},
+		{Class: "fa-home", Text: "系统配置", Href: "/admin_setting/list"},
+		{Class: "fa-home", Text: "修改密码", Href: "/admin/password"},
+		{Class: "fa-share", Text: "退出:" + who, Href: "javascript:vueMenu.logout()"},
 	}
 }
 
 // GetAdmMenu ...
 func (Menu) GetAdmMenu(who string) []Menu {
 	return []Menu{
-		Menu{Class: "fa-home", Text: "仪表盘", Href: "#/admin/dashboard"},
-		Menu{Class: "fa-home", Text: "用户管理", Href: "#/admin/user/list"},
-		Menu{Class: "fa-dashboard", Text: "示例",
+		{Class: "fa-home", Text: "仪表盘", Href: "#/admin/dashboard"},
+		{Class: "fa-home", Text: "用户管理", Href: "#/admin/user/list"},
+		{Class: "fa-dashboard", Text: "示例",
 			Child: []Menu{
-				Menu{Class: "fa-circle-o", Text: "表单", Href: "#/admin/form"},
-				Menu{Class: "fa-circle-o", Text: "表格", Href: "#/admin/table"},
+				{Class: "fa-circle-o", Text: "表单", Href: "#/admin/form"},
+				{Class: "fa-circle-o", Text: "表格", Href: "#/admin/table"},
 			}},
-		Menu{Class: "fa-home", Text: "系统配置", Href: "#/admin/setting/list"},
-		Menu{Class: "fa-home", Text: "修改密码", Href: "#/admin/password"},
-		Menu{Class: "fa-share", Text: "退出:" + who, Href: "#/admin/logout"},
+		{Class: "fa-home", Text: "系统配置", Href: "#/admin/setting/list"},
+		{Class: "fa-home", Text: "修改密码", Href: "#/admin/password"},
+		{Class: "fa-share", Text: "退出:" + who, Href: "#/admin/logout"},
 	}
 }

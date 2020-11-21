@@ -21,28 +21,94 @@ import (
 
 // ...
 var (
-	db        *gorm.DB
-	DBUser    = NewUser()
-	DBMember  = NewMember()
-	DBSetting = NewSetting()
+	db          *gorm.DB
+	autoMigrate = []interface{}{&Member{}, &User{}, &Setting{}}
+	DBUser      = NewUser()
+	DBMember    = NewMember()
+	DBSetting   = NewSetting()
 )
 
 type model struct {
 	ll *logger.Logger
 }
 
+// Init 初始化数据库
+func Init(dbPath string) error {
+	var err error
+
+	_ = os.MkdirAll(filepath.Dir(dbPath), 0755)
+	if db, err = gorm.Open("sqlite3", dbPath); err != nil {
+		// if db, err = gorm.Open("postgres", "postgres://user:pass@host/database?sslmode=disable"); err != nil {
+		return err
+	}
+	sqlLog := logger.NewLogger(common.LLFile)
+	sqlLog.SetFlags(0)
+	db.SetLogger(&model{ll: sqlLog})
+	db.LogMode(true)
+	db.SingularTable(true)
+	db.DB().SetMaxOpenConns(2)
+	db.SetNowFuncOverride(func() time.Time {
+		return time.Now().In(common.TimeLocation)
+	})
+
+	if err := db.AutoMigrate(autoMigrate...).Error; err != nil {
+		return err
+	}
+
+	var m Member
+	if err := db.First(&m).Error; err != nil {
+		if err := db.Save(&Member{User: "admin", Pass: string(common.Hash([]byte("admin")))}).Error; err != nil {
+			return err
+		}
+
+		// 创建50个测试账号
+		for i := 0; i < 50; i++ {
+			if err := db.Save(&User{User: fmt.Sprintf("user-%d", i), Email: fmt.Sprintf("email-%d@xx.com", i)}).Error; err != nil {
+				return err
+			}
+		}
+	}
+
+	// 初始化系统配置
+	defaultSetting := []Setting{
+		{Key: "Int1", Type: 0, Int: 1},
+		{Key: "String2", Type: 1, String: "string2"},
+		{Key: "Bool3", Type: 2, Bool: true},
+	}
+	for _, v := range defaultSetting {
+		var d Setting
+		if err := db.First(&d, &Setting{Key: v.Key}).Error; err != nil {
+			common.LL.Log0Debug(v.Key)
+			if err := db.Save(&v).Error; err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+// Close 关闭数据库
+func Close() {
+	if db != nil {
+		db.Close()
+		db = nil
+	}
+}
+
+// Print 自定义日志，UPDATE/INSERT必须打印日志
 func (o model) Print(arg ...interface{}) {
 	if arg[0].(string) != "sql" {
 		return
 	}
 	if strings.HasPrefix(arg[3].(string), "UPDATE ") || strings.HasPrefix(arg[3].(string), "INSERT ") {
-		o.ll.Log4Trace(LogFormatter(arg...)...)
+		o.ll.Log4Trace(logFormatter(arg...)...)
 	} else {
-		o.ll.Log0Debug(LogFormatter(arg...)...)
+		o.ll.Log0Debug(logFormatter(arg...)...)
 	}
 }
 
-var LogFormatter = func(values ...interface{}) (messages []interface{}) {
+// sql 自定义日志格式
+func logFormatter(values ...interface{}) (messages []interface{}) {
 	sqlRegexp := regexp.MustCompile(`\?`)
 	numericPlaceHolderRegexp := regexp.MustCompile(`\$\d+`)
 	isPrintable := func(s string) bool {
@@ -144,67 +210,4 @@ var LogFormatter = func(values ...interface{}) (messages []interface{}) {
 	}
 
 	return
-}
-
-// Init 初始化数据库
-func Init(dbPath string) error {
-	var err error
-
-	_ = os.MkdirAll(filepath.Dir(dbPath), 0755)
-	if db, err = gorm.Open("sqlite3", dbPath); err != nil {
-		// if db, err = gorm.Open("postgres", "postgres://user:pass@host/database?sslmode=disable"); err != nil {
-		return err
-	}
-	sqlLog := logger.NewLogger(common.LLFile)
-	sqlLog.SetFlags(0)
-	db.SetLogger(&model{ll: sqlLog})
-	db.LogMode(true)
-	db.SingularTable(true)
-	db.DB().SetMaxOpenConns(2)
-	db.SetNowFuncOverride(func() time.Time {
-		return time.Now().In(common.TimeLocation)
-	})
-
-	if err := db.AutoMigrate(&Member{}, &User{}, &Setting{}).Error; err != nil {
-		return err
-	}
-
-	var m Member
-	if err := db.First(&m).Error; err != nil {
-		if err := db.Save(&Member{User: "admin", Pass: string(common.Hash([]byte("admin")))}).Error; err != nil {
-			return err
-		}
-
-		// 创建50个测试账号
-		for i := 0; i < 50; i++ {
-			if err := db.Save(&User{User: fmt.Sprintf("user-%d", i), Email: fmt.Sprintf("email-%d@xx.com", i)}).Error; err != nil {
-				return err
-			}
-		}
-	}
-
-	// 初始化系统配置
-	defaultSetting := []Setting{
-		Setting{Key: "Int1", Type: 0, Int: 1},
-		Setting{Key: "String2", Type: 1, String: "string2"},
-		Setting{Key: "Bool3", Type: 2, Bool: true},
-	}
-	for _, v := range defaultSetting {
-		var d Setting
-		if err := db.First(&d, &Setting{Key: v.Key}).Error; err != nil {
-			common.LL.Log0Debug(v.Key)
-			if err := db.Save(&v).Error; err != nil {
-				return err
-			}
-		}
-	}
-	return nil
-}
-
-// Close ...
-func Close() {
-	if db != nil {
-		db.Close()
-		db = nil
-	}
 }
